@@ -2,13 +2,15 @@ import logging
 import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from handlers import startdelivery
 
-
+def start(bot, update):
+	update.effective_message.reply_text("Hi!")
 
 if __name__ == "__main__":
 	# Set these variable to the appropriate values
 	TOKEN = os.environ.get('BOT_TOKEN')
-	NAME = nusdapao
+	NAME = 'nusdapao'
 
 	# Port is given by Heroku
 	PORT = os.environ.get('PORT')
@@ -21,9 +23,10 @@ if __name__ == "__main__":
 	# Set up the Updater
 	updater = Updater(TOKEN)
 	dp = updater.dispatcher
+
 	# Add handlers
 	dp.add_handler(CommandHandler('start', start))
-	dp.add_handler(MessageHandler(Filters.text, echo))
+	dp.add_handler(CommandHandler('startdelivery', startdelivery.initiate_convo))
 	dp.add_handler(error)
 
 	# Start the webhook
