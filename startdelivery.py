@@ -1,4 +1,4 @@
-from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
 						  ConversationHandler)
 
@@ -7,6 +7,7 @@ import database
 from datetime import date, datetime, timedelta
 
 CACHE = {}
+ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nClick the button below to order!'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					level=logging.INFO)
@@ -81,12 +82,23 @@ def pick_up_point(bot, update):
 		return ConversationHandler.END
 
 	CACHE[user.id]['pickup'] = update.message.text
+	delivery = CACHE.pop(user.id)
 
-	database.start_delivery(CACHE.pop(user.id))
+	deliveryId = database.start_delivery(delivery)
 
 	logger.info("%s Pickup point: %s", user.first_name, update.message.text)
 	update.message.reply_text(
 		'Thank you, your delivery has been registered!')
+
+	# send message to group chat
+	bot.send_message(
+		delivery['chat'],
+		ORDER_CONFIRM_MESSAGE %
+		(delivery['location'], delivery['user'], delivery['closes'], delivery['arrival'], delivery['pickup']),
+		reply_markup=InlineKeyboardMarkup([
+			InlineKeyboardButton('Join delivery!', callback_data=str(deliveryId))
+		])
+	)
 
 	logger.info('%s\'s order: %s', user.first_name, CACHE[user.id])
 
