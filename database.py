@@ -13,7 +13,7 @@ def with_rollback(fn):
 	def wrapped(*args, **kwargs):
 		try:
 			return fn(*args, **kwargs)
-		except pg8000.Connection.Error:
+		except pg8000.Connection.ProgrammingError:
 			CONN.rollback()
 	return wrapped
 
