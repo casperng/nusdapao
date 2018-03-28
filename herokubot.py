@@ -7,6 +7,9 @@ from handlers import startdelivery
 def start(bot, update):
 	update.effective_message.reply_text("Hi!")
 
+def error(bot, update, error):
+	logger.warning('Update "%s" caused error "%s"', update, error)
+
 if __name__ == "__main__":
 	# Set these variable to the appropriate values
 	TOKEN = os.environ.get('BOT_TOKEN')
@@ -27,7 +30,7 @@ if __name__ == "__main__":
 	# Add handlers
 	dp.add_handler(CommandHandler('start', start))
 	dp.add_handler(CommandHandler('startdelivery', startdelivery.initiate_convo))
-	dp.add_handler(error)
+	dp.add_error_handler(error)
 
 	# Start the webhook
 	updater.start_webhook(listen="0.0.0.0",
