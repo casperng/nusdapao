@@ -7,7 +7,7 @@ import database
 from datetime import date, datetime, timedelta
 
 CACHE = {}
-ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nClick the button below to order!'
+ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nJoin the delivery with code %s'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					level=logging.INFO)
@@ -94,13 +94,10 @@ def pick_up_point(bot, update):
 	bot.send_message(
 		delivery['chat'],
 		ORDER_CONFIRM_MESSAGE %
-		(delivery['location'], delivery['user'], delivery['closes'], delivery['arrival'], delivery['pickup']),
-		reply_markup=InlineKeyboardMarkup([
-			InlineKeyboardButton('Join delivery!', callback_data=str(deliveryId))
-		])
+		(delivery['location'], delivery['user'], delivery['closes'], delivery['arrival'], delivery['pickup'], deliveryId)
 	)
 
-	logger.info('%s\'s order: %s', user.first_name, CACHE[user.id])
+	logger.info('%s\'s order: %s', user.first_name, delivery)
 
 	return ConversationHandler.END
 
