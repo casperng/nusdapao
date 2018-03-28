@@ -94,7 +94,7 @@ def pick_up_point(bot, update):
 	bot.send_message(
 		delivery['chat'],
 		ORDER_CONFIRM_MESSAGE %
-		(delivery['location'], delivery['user'], delivery['closes'], delivery['arrival'], delivery['pickup'], deliveryId)
+		(delivery['location'], user.first_name, delivery['closes'], delivery['arrival'], delivery['pickup'], deliveryId)
 	)
 
 	logger.info('%s\'s order: %s', user.first_name, delivery)
