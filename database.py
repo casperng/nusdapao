@@ -1,7 +1,6 @@
 import os
 import pg8000
 
-
 CONN = pg8000.connect(
 	database=os.environ.get('DATABASE_NAME'),
 	user=os.environ.get('DATABASE_USER'),
@@ -10,7 +9,15 @@ CONN = pg8000.connect(
 	# port=os.environ.get('DATABASE_PORT')
 )
 
+def with_rollback(fn):
+	def wrapped(*args, **kwargs):
+		try:
+			fn(*args, **kwargs)
+		except pg8000.Connection.Error:
+			CONN.rollback()
+	return wrapped
 
+@with_rollback
 def start_delivery(details):
 	cursor = CONN.cursor()
 	cursor.execute(
@@ -27,6 +34,7 @@ def start_delivery(details):
 	deliveryId = results[0][0]
 	return deliveryId
 
+@with_rollback
 def is_valid_delivery_id(deliveryId):
 	cursor = CONN.cursor()
 	cursor.execute(
@@ -42,6 +50,7 @@ def is_valid_delivery_id(deliveryId):
 	count = results[0][0]
 	return count > 0
 
+@with_rollback
 def add_order(details):
 	cursor = CONN.cursor()
 	cursor.execute(
@@ -58,6 +67,23 @@ def add_order(details):
 	deliveryId = results[0][0]
 	return deliveryId
 
+@with_rollback
+def get_orders(deliveryid):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+		SELECT * FROM orders
+		with deliveryid = %s
+		""",
+		[deliveryid]
+	)
+	results = cursor.fetchall()
+	CONN.commit()
+	cursor.close()
+
+	return results
+
+@with_rollback
 def has_active_deliveries():
 	cursor = CONN.cursor()
 	cursor.execute(
