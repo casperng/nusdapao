@@ -26,7 +26,7 @@ def delivery_id(bot, update):
 		return DELIVERY_ID
 
 	orders = database.get_orders(deliveryId)
-	logger.info("Orders", orders)
+	logger.info("Orders for %s: %s", deliveryId, orders)
 
 	update.message.reply_text(
 		orders)

@@ -4,6 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 import logging
 import database
+import notifications
 from datetime import date, datetime, timedelta
 
 ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nJoin the delivery with code %s'
@@ -15,9 +16,6 @@ logger = logging.getLogger(__name__)
 
 
 ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT = range(4)
-
-def notify_arrival_soon(context):
-	pass
 
 def start_delivery(bot, update, chat_data):
 	chat_data[update.message.from_user.id] = {
@@ -91,7 +89,7 @@ def pick_up_point(bot, update, chat_data, job_queue):
 		(delivery['location'], user.first_name, delivery['closes'], delivery['arrival'], delivery['pickup'], deliveryId)
 	)
 
-	job = job_queue.run_once(notify_arrival_soon, delivery['arrival'] - timedelta(minutes=15), context=delivery['chat'])
+	job = job_queue.run_once(notifications.notify_arrival_soon, delivery['arrival'] - timedelta(minutes=15), context=delivery['chat'])
 
 	logger.info('%s\'s order: %s', user.first_name, delivery)
 

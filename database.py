@@ -13,7 +13,7 @@ def with_rollback(fn):
 	def wrapped(*args, **kwargs):
 		try:
 			return fn(*args, **kwargs)
-		except pg8000.Connection.ProgrammingError:
+		except pg8000.Error:
 			CONN.rollback()
 	return wrapped
 
@@ -73,7 +73,7 @@ def get_orders(deliveryid):
 	cursor.execute(
 		"""
 		SELECT * FROM orders
-		with deliveryid = %s
+		WHERE deliveryid = %s
 		""",
 		[deliveryid]
 	)
