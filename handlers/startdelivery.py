@@ -50,3 +50,26 @@ def pick_up_point(bot, update):
 		'Thank you, your delivery has been registered!')
 
 	return ConversationHandler.END
+
+def cancel(bot, update):
+	user = update.message.from_user
+	logger.info("User %s canceled the conversation.", user.first_name)
+	update.message.reply_text(
+		'Alright, bye!')
+
+	return ConversationHandler.END
+
+
+conv_handler = ConversationHandler(
+	entry_points=[CommandHandler('startdelivery', initiate_convo)],
+	states={
+		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from)],
+
+		ORDER_CLOSE: [MessageHandler(Filters.text, order_close)],
+
+		ARRIVAL_TIME: [MessageHandler(Filters.text, arrival_time)],
+
+		PICK_UP_POINT: [MessageHandler(Filters.text, pick_up_point)]
+	},
+	fallbacks=[CommandHandler('cancel', cancel)]
+)
