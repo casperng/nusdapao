@@ -1,9 +1,9 @@
-
 from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove)
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
 						  ConversationHandler)
 
 import logging
+import database
 
 CACHE = {}
 
@@ -16,7 +16,10 @@ logger = logging.getLogger(__name__)
 ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT = range(4)
 
 def initiate_convo(bot, update):
-	CACHE[update.message.from_user.id] = {'chat': update.message.chat_id}
+	CACHE[update.message.from_user.id] = {
+		'chat': update.message.chat_id,
+		'user': update.message.from_user.id
+	}
 
 	bot.send_message(update.message.from_user.id, 'Hi! Where are you ordering food from?')
 
@@ -27,7 +30,7 @@ def ordering_from(bot, update):
 	if user.id not in CACHE:
 		return ConversationHandler.END
 
-	CACHE[user.id]['from'] = update.message.text
+	CACHE[user.id]['location'] = update.message.text
 
 	logger.info("%s Ordering from: %s", user.first_name, update.message.text)
 	update.message.reply_text(
@@ -66,6 +69,8 @@ def pick_up_point(bot, update):
 		return ConversationHandler.END
 
 	CACHE[user.id]['pickup'] = update.message.text
+
+	database.start_delivery(CACHE.pop(user.id))
 
 	logger.info("%s Pickup point: %s", user.first_name, update.message.text)
 	update.message.reply_text(

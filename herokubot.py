@@ -2,7 +2,7 @@ import logging
 import os
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from handlers import startdelivery
+import startdelivery
 
 def start(bot, update):
 	update.effective_message.reply_text("Hi!")
