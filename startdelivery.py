@@ -4,6 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 import logging
 import database
+from datetime import date, datetime, timedelta
 
 CACHE = {}
 
@@ -34,20 +35,25 @@ def ordering_from(bot, update):
 
 	logger.info("%s Ordering from: %s", user.first_name, update.message.text)
 	update.message.reply_text(
-		'What time will the order close?')
+		'What time will the order close? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
 
 	return ORDER_CLOSE
 
 def order_close(bot, update):
 	user = update.message.from_user
 	if user.id not in CACHE:
-		return ConversationHandler.END
+		return ConversationHandler.END 
 
-	CACHE[user.id]['closes'] = update.message.text
+	try:
+		CACHE[user.id]['closes'] = datetime_from_text(update.message.text)
+	except:
+		update.message.reply_text(
+		'Invalid close time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
+		return ORDER_CLOSE
 
 	logger.info("%s Order closes: %s", user.first_name, update.message.text)
 	update.message.reply_text(
-		'What time will the order arrive?')
+		'What time will the order arrive? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
 
 	return ARRIVAL_TIME
 
@@ -56,7 +62,13 @@ def arrival_time(bot, update):
 	if user.id not in CACHE:
 		return ConversationHandler.END
 
-	CACHE[user.id]['arrival'] = update.message.text
+	try:
+		CACHE[user.id]['arrival'] = datetime_from_text(update.message.text)
+	except:
+		update.message.reply_text(
+		'Invalid arrival time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
+		return ARRIVAL_TIME
+
 	logger.info("%s Arrival time: %s", user.first_name, update.message.text)
 	update.message.reply_text(
 		'Where is the pickup point?')
@@ -89,6 +101,13 @@ def cancel(bot, update):
 		'Alright, bye!')
 
 	return ConversationHandler.END
+
+def datetime_from_text(text):
+	r_date = date.today().strftime(r" %Y %m %d")
+	r_datetime = datetime.strptime(text + r_date, r"%H%M %Y %m %d")
+	if r_datetime < datetime.now():
+		r_datetime += timedelta(days=1)
+	return r_datetime
 
 
 conv_handler = ConversationHandler(

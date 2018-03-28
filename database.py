@@ -13,12 +13,8 @@ CONN = pg8000.connect(
 
 def start_delivery(details):
 	cursor = CONN.cursor()
-	cursor.execute(
-		"""
-		INSERT INTO deliveries (chat, user, location, closes, arrival, pickup)
-		VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
-		""",
-		(details['chat'], details['user'], details['location'], details['closes'], details['arrival'], details['pickup'])
+	cursor.execute("INSERT INTO deliveries (chat, user, location, closes, arrival, pickup) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+		[details['chat'], details['user'], details['location'], details['closes'], details['arrival'], details['pickup']]
 	)
 	results = cursor.fetchall()
 	CONN.commit()
