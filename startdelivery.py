@@ -6,7 +6,6 @@ import logging
 import database
 from datetime import date, datetime, timedelta
 
-CACHE = {}
 ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nJoin the delivery with code %s'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -17,8 +16,11 @@ logger = logging.getLogger(__name__)
 
 ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT = range(4)
 
-def start_delivery(bot, update):
-	CACHE[update.message.from_user.id] = {
+def notify_arrival_soon(context):
+	pass
+
+def start_delivery(bot, update, chat_data):
+	chat_data[update.message.from_user.id] = {
 		'chat': update.message.chat_id,
 		'user': update.message.from_user.id
 	}
@@ -27,12 +29,10 @@ def start_delivery(bot, update):
 
 	return ORDERING_FROM
 
-def ordering_from(bot, update):
+def ordering_from(bot, update, chat_data):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END
 
-	CACHE[user.id]['location'] = update.message.text
+	chat_data[user.id]['location'] = update.message.text
 
 	logger.info("%s Ordering from: %s", user.first_name, update.message.text)
 	update.message.reply_text(
@@ -40,13 +40,11 @@ def ordering_from(bot, update):
 
 	return ORDER_CLOSE
 
-def order_close(bot, update):
+def order_close(bot, update, chat_data):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END 
 
 	try:
-		CACHE[user.id]['closes'] = datetime_from_text(update.message.text)
+		chat_data[user.id]['closes'] = datetime_from_text(update.message.text)
 	except:
 		update.message.reply_text(
 		'Invalid close time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
@@ -58,13 +56,11 @@ def order_close(bot, update):
 
 	return ARRIVAL_TIME
 
-def arrival_time(bot, update):
+def arrival_time(bot, update, chat_data):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END
 
 	try:
-		CACHE[user.id]['arrival'] = datetime_from_text(update.message.text)
+		chat_data[user.id]['arrival'] = datetime_from_text(update.message.text)
 	except:
 		update.message.reply_text(
 		'Invalid arrival time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
@@ -76,13 +72,11 @@ def arrival_time(bot, update):
 
 	return PICK_UP_POINT
 
-def pick_up_point(bot, update):
+def pick_up_point(bot, update, chat_data, job_queue):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END
 
-	CACHE[user.id]['pickup'] = update.message.text
-	delivery = CACHE.pop(user.id)
+	chat_data[user.id]['pickup'] = update.message.text
+	delivery = chat_data.pop(user.id)
 
 	deliveryId = database.start_delivery(delivery)
 
@@ -97,13 +91,14 @@ def pick_up_point(bot, update):
 		(delivery['location'], user.first_name, delivery['closes'], delivery['arrival'], delivery['pickup'], deliveryId)
 	)
 
+	job = job_queue.run_once(notify_arrival_soon, delivery['arrival'] - timedelta(minutes=15), context=delivery['chat'])
+
 	logger.info('%s\'s order: %s', user.first_name, delivery)
 
 	return ConversationHandler.END
 
 def cancel(bot, update):
 	user = update.message.from_user
-	CACHE.pop(user.id, None)
 
 	logger.info("User %s canceled the conversation.", user.first_name)
 	update.message.reply_text(
@@ -120,15 +115,15 @@ def datetime_from_text(text):
 
 
 start_delivery_conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('startdelivery', start_delivery)],
+	entry_points=[CommandHandler('startdelivery', start_delivery, pass_chat_data=True)],
 	states={
-		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from)],
+		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from, pass_chat_data=True)],
 
-		ORDER_CLOSE: [MessageHandler(Filters.text, order_close)],
+		ORDER_CLOSE: [MessageHandler(Filters.text, order_close, pass_chat_data=True)],
 
-		ARRIVAL_TIME: [MessageHandler(Filters.text, arrival_time)],
+		ARRIVAL_TIME: [MessageHandler(Filters.text, arrival_time, pass_chat_data=True)],
 
-		PICK_UP_POINT: [MessageHandler(Filters.text, pick_up_point)]
+		PICK_UP_POINT: [MessageHandler(Filters.text, pick_up_point, pass_job_queue=True, pass_chat_data=True)]
 	},
 	fallbacks=[CommandHandler('cancel', cancel)]
 )

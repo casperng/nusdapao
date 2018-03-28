@@ -10,12 +10,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-CACHE = {}
-
 DELIVERY_ID, QUANTITY, PAYMENT_METHOD, REMARKS = range(4)
 
-def join_delivery(bot, update):
-	CACHE[update.message.from_user.id] = {
+def join_delivery(bot, update, chat_data):
+	chat_data[update.message.from_user.id] = {
 		'userid': update.message.from_user.id,
 		'username': update.message.from_user.first_name
 	}
@@ -25,10 +23,8 @@ def join_delivery(bot, update):
 	return DELIVERY_ID
 
 
-def delivery_id(bot, update):
+def delivery_id(bot, update, chat_data):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END
 
 	deliveryId = update.message.text
 	if not database.is_valid_delivery_id(deliveryId):
@@ -40,47 +36,41 @@ def delivery_id(bot, update):
 	update.message.reply_text(
 		'How many of this item are you getting?')
 
-	CACHE[user.id]['deliveryId'] = update.message.text
+	chat_data[user.id]['deliveryId'] = update.message.text
 
 	return QUANTITY
 
-def quantity(bot, update):
+def quantity(bot, update, chat_data):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END
 
 	logger.info("%s for quantity: %s", user.first_name, update.message.text)
 	update.message.reply_text(
 		'What is your payment method?')
 
-	CACHE[user.id]['qty'] = update.message.text
+	chat_data[user.id]['qty'] = update.message.text
 
 	return PAYMENT_METHOD
 
-def payment_method(bot, update):
+def payment_method(bot, update, chat_data):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END
 
 	logger.info("%s payment method: %s", user.first_name, update.message.text)
 	update.message.reply_text(
 		'Any remarks? Type "no" if you have none')
 
-	CACHE[user.id]['method'] = update.message.text
+	chat_data[user.id]['method'] = update.message.text
 
 	return REMARKS
 
-def remarks(bot, update):
+def remarks(bot, update, chat_data):
 	user = update.message.from_user
-	if user.id not in CACHE:
-		return ConversationHandler.END
 
 	remarks = update.message.text
 	if remarks.lower() == 'no':
 		remarks = ''
 
-	CACHE[user.id]['remarks'] = remarks
-	order = CACHE.pop(user.id)
+	chat_data[user.id]['remarks'] = remarks
+	order = chat_data.pop(user.id)
 
 	database.add_order(order)
 
@@ -95,12 +85,12 @@ def cancel(bot, update):
 
 
 join_delivery_conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('joindelivery', join_delivery)],
+	entry_points=[CommandHandler('joindelivery', join_delivery, pass_chat_data=True)],
 	states={
-		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id)],
-		QUANTITY: [MessageHandler(Filters.text, quantity)],
-		PAYMENT_METHOD: [MessageHandler(Filters.text, payment_method)],
-		REMARKS: [MessageHandler(Filters.text, remarks)],
+		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_chat_data=True)],
+		QUANTITY: [MessageHandler(Filters.text, quantity, pass_chat_data=True)],
+		PAYMENT_METHOD: [MessageHandler(Filters.text, payment_method, pass_chat_data=True)],
+		REMARKS: [MessageHandler(Filters.text, remarks, pass_chat_data=True)],
 	},
 	fallbacks=[CommandHandler('cancel', cancel)]
 )
