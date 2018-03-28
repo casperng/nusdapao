@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT = range(4)
 
-def initiate_convo(bot, update):
+def start_delivery(bot, update):
 	CACHE[update.message.from_user.id] = {
 		'chat': update.message.chat_id,
 		'user': update.message.from_user.id
@@ -119,8 +119,8 @@ def datetime_from_text(text):
 	return r_datetime
 
 
-conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('startdelivery', initiate_convo)],
+start_delivery_conv_handler = ConversationHandler(
+	entry_points=[CommandHandler('startdelivery', start_delivery)],
 	states={
 		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from)],
 

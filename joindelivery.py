@@ -14,7 +14,7 @@ CACHE = {}
 
 DELIVERY_ID, QUANTITY, PAYMENT_METHOD, REMARKS = range(4)
 
-def initiate_convo(bot, update):
+def join_delivery_conv_handler(bot, update):
 	CACHE[update.message.from_user.id] = {
 		'userid': update.message.from_user.id,
 		'username': update.message.from_user.first_name
@@ -94,8 +94,8 @@ def cancel(bot, update):
 	return ConversationHandler.END
 
 
-conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('joindelivery', initiate_convo)],
+join_delivery_conv_handler = ConversationHandler(
+	entry_points=[CommandHandler('joindelivery', join_delivery_conv_handler)],
 	states={
 		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id)],
 		QUANTITY: [MessageHandler(Filters.text, quantity)],
