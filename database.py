@@ -31,7 +31,7 @@ def is_valid_delivery_id(deliveryId):
 	cursor = CONN.cursor()
 	cursor.execute(
 		"""
-		SELECT EXISTS(*) from deliveries 
+		SELECT COUNT(*) from deliveries 
 		WHERE id = %s
 		""",
 		[deliveryId]
@@ -39,8 +39,8 @@ def is_valid_delivery_id(deliveryId):
 	results = cursor.fetchall()
 	cursor.close()
 
-	deliveryId = results[0][0]
-	return deliveryId
+	count = results[0][0]
+	return count > 0
 
 def add_order(details):
 	cursor = CONN.cursor()
