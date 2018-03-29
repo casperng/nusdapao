@@ -134,6 +134,47 @@ def get_user_orders(deliveryid, userid):
 	return list(map(repack, results))
 
 @with_rollback
+def get_user_deliveries(userid):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+        SELECT id, location, closes, arrival, pickup FROM deliveries
+        WHERE userid = %s
+        """,
+		[userid]
+	)
+	results = cursor.fetchall()
+	cursor.close()
+
+	def repack(row):
+		deliveryid, location, closes, arrival, pickup = row
+		return {
+			'deliveryid': deliveryid,
+			'location': location,
+			'closes': closes,
+			'arrival': arrival,
+			'pickup': pickup
+		}
+
+	return list(map(repack, results))
+
+@with_rollback
+def close_order_for_delivery(userid, deliveryid):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+        UPDATE deliveries
+        SET closes = NOW() 
+        WHERE id = %s AND userid = %s
+        """,
+		[deliveryid, userid]
+	)
+	results = cursor.fetchall()
+	CONN.commit()
+	cursor.close()
+	return True
+
+@with_rollback
 def delete_user_order(userid, orderid):
 	cursor = CONN.cursor()
 	cursor.execute(
