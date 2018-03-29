@@ -34,7 +34,7 @@ def delivery_id(bot, update, chat_data):
 
     reply = ORDER_MESSAGE_TEMPLATE
     order_list = {}
-    i = 0
+    i = 1
     for order in orders:
         if order['remarks']:
             reply += str(i) + '. ' + ORDER_ITEM_MESSAGE_TEMPLATE.format(**order)
@@ -50,7 +50,7 @@ def delivery_id(bot, update, chat_data):
 
 def item_index(bot, update, chat_data):
     try:
-        order = chat_data['order_list'][int(update.message.reply_text)]
+        order = chat_data['order_list'][int(update.message.reply_text) - 1]
     except:
         update.message.reply_text(
             "Invalid item number. Please try again")
