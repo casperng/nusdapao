@@ -32,6 +32,11 @@ def delivery_id(bot, update, chat_data):
 			'Invalid delivery ID, please try again')
 		return DELIVERY_ID
 
+	if not database.is_order_open(deliveryId):
+		update.message.reply_text(
+			'Sorry, the order has already closed!')
+		return ConversationHandler.END
+
 	logger.info("%s for delivery: %s", user.first_name, update.message.text)
 	update.message.reply_text(
 		'How many of this item are you getting?')

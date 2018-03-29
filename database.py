@@ -72,13 +72,37 @@ def get_orders(deliveryid):
 	cursor = CONN.cursor()
 	cursor.execute(
 		"""
-		SELECT * FROM orders
+		SELECT userid, username, method, remarks, qty FROM orders
 		WHERE deliveryid = %s
 		""",
 		[deliveryid]
 	)
 	results = cursor.fetchall()
-	CONN.commit()
+	cursor.close()
+
+	def repack(row):
+		userid, username, method, remarks, qty = row
+		return {
+			'userid': userid,
+			'username': username,
+			'method': method,
+			'remarks': remarks,
+			'qty': qty
+		}
+
+	return list(map(repack, results))
+
+@with_rollback
+def is_order_open(deliveryid):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+        SELECT COUNT(*) FROM deliveries
+        WHERE id = %s  
+        """,
+		[deliveryid]
+	)
+	results = cursor.fetchall()
 	cursor.close()
 
 	return results
