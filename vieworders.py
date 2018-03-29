@@ -4,6 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 						  ConversationHandler)
 
 import database
+import utilities
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					level=logging.INFO)
@@ -11,10 +12,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 logger = logging.getLogger(__name__)
 
 DELIVERY_ID = range(1)
-
-ORDER_MESSAGE_TEMPLATE = "The orders are:\n"
-ORDER_ITEM_MESSAGE_TEMPLATE = "{qty} ({remarks}) - {username} [{method}]\n"
-ORDER_ITEM_MESSAGE_NO_REMARKS_TEMPLATE = "{qty} - {username} [{method}]\n"
 
 def view_orders(bot, update):
 	bot.send_message(update.message.from_user.id, 'What delivery ID are you checking for?')
@@ -32,15 +29,8 @@ def delivery_id(bot, update):
 	orders = database.get_orders(deliveryId)
 	logger.info("Orders for %s: %s", deliveryId, orders)
 
-	reply = ORDER_MESSAGE_TEMPLATE
-	for order in orders:
-		if order['remarks']:
-			reply += ORDER_ITEM_MESSAGE_TEMPLATE.format(**order)
-		else:
-			reply += ORDER_ITEM_MESSAGE_NO_REMARKS_TEMPLATE.format(**order)
-
 	update.message.reply_text(
-		reply)
+		utilities.build_view_orders_string(orders))
 	return ConversationHandler.END
 
 def cancel(bot, update):

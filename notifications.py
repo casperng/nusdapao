@@ -4,6 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 import logging
 import database
+import utilities
 import notifications
 from datetime import date, datetime, timedelta
 
@@ -11,6 +12,16 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 					level=logging.INFO)
 
 logger = logging.getLogger(__name__)
+
+
+def notify_close(bot, job):
+    text = 'Orders for your delivery have closed!\n'
+    orders = database.get_orders(job.context['id'])
+
+    bot.send_message(
+        job.context['user'],
+        text + utilities.build_view_orders_string(orders))
+
 
 def notify_arrival_soon(bot, job):
     text = 'The order for {location} will arrive in 15 minutes! The pickup point is at {pickup}'.format(**job.context)

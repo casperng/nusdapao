@@ -90,8 +90,19 @@ def pick_up_point(bot, update, chat_data, job_queue):
 		(delivery['location'], user.first_name, delivery['closes'], delivery['arrival'], delivery['pickup'], deliveryId)
 	)
 
-	job = job_queue.run_once(notifications.notify_arrival_soon, delivery['arrival'].astimezone().replace(tzinfo=None) - timedelta(minutes=15), context=delivery)
-	job = job_queue.run_once(notifications.notify_arrival, delivery['arrival'].astimezone().replace(tzinfo=None), context=delivery)
+	job1 = job_queue.run_once(
+		notifications.notify_close,
+		delivery['closes'].astimezone().replace(tzinfo=None),
+		context=delivery,
+		name= str(deliveryId) + '_close_job')
+	job2 = job_queue.run_once(
+		notifications.notify_arrival_soon,
+		delivery['arrival'].astimezone().replace(tzinfo=None) - timedelta(minutes=15),
+		context=delivery)
+	job3 = job_queue.run_once(
+		notifications.notify_arrival,
+		delivery['arrival'].astimezone().replace(tzinfo=None),
+		context=delivery)
 
 	logger.info('%s\'s order: %s', user.first_name, delivery)
 
