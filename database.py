@@ -93,6 +93,23 @@ def get_orders(deliveryid):
 	return list(map(repack, results))
 
 @with_rollback
+def get_users(deliveryid):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+        SELECT DISTINCT t2.userid FROM orders t2
+        INNER JOIN deliveries t1
+        ON t1.id = t2.deliveryid
+        WHERE t1.id = %s
+        """,
+		[deliveryid]
+	)
+	results = cursor.fetchall()
+	cursor.close()
+
+	return [row[0] for row in results]
+
+@with_rollback
 def is_order_open(deliveryid):
 	cursor = CONN.cursor()
 	cursor.execute(

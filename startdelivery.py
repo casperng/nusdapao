@@ -77,6 +77,7 @@ def pick_up_point(bot, update, chat_data, job_queue):
 	delivery = chat_data.pop(user.id)
 
 	deliveryId = database.start_delivery(delivery)
+	delivery['id'] = deliveryId
 
 	logger.info("%s Pickup point: %s", user.first_name, update.message.text)
 	update.message.reply_text(
@@ -89,7 +90,8 @@ def pick_up_point(bot, update, chat_data, job_queue):
 		(delivery['location'], user.first_name, delivery['closes'], delivery['arrival'], delivery['pickup'], deliveryId)
 	)
 
-	job = job_queue.run_once(notifications.notify_arrival_soon, delivery['arrival'] - timedelta(minutes=15), context=delivery['chat'])
+	job = job_queue.run_once(notifications.notify_arrival_soon, delivery['arrival'] - timedelta(minutes=15), context=delivery)
+	job = job_queue.run_once(notifications.notify_arrival, delivery['arrival'], context=delivery)
 
 	logger.info('%s\'s order: %s', user.first_name, delivery)
 

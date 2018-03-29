@@ -12,5 +12,21 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-def notify_arrival_soon(context):
-    pass
+def notify_arrival_soon(bot, job):
+    text = 'The order for {location} will arrive in 15 minutes! The pickup point is at {pickup}'.format(**job.delivery)
+
+    def notify_user(userid):
+        bot.send_message(userid, text=text)
+
+    users = database.get_users(job.context['id'])
+    map(notify_user, users)
+
+
+def notify_arrival(bot, job):
+    text = 'The order for {location} is arriving! The pickup point is at {pickup}'.format(**job.delivery)
+
+    def notify_user(userid):
+        bot.send_message(userid, text=text)
+
+    users = database.get_users(job.context['id'])
+    map(notify_user, users)
