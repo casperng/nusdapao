@@ -29,9 +29,9 @@ def delivery_id(bot, update, chat_data):
 	user = update.message.from_user
 
 	deliveryId = update.message.text
-	if not database.is_valid_delivery_id(deliveryId):
+	if not database.is_open_delivery_id(deliveryId):
 		update.message.reply_text(
-			'Invalid delivery ID, please try again')
+			'Invalid delivery ID, please try again. Check that it hasn\'t closed')
 		return DELIVERY_ID
 
 	if not database.is_order_open(deliveryId):

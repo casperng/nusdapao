@@ -51,6 +51,22 @@ def is_valid_delivery_id(deliveryId):
 	return count > 0
 
 @with_rollback
+def is_open_delivery_id(deliveryId):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+		SELECT COUNT(*) from deliveries 
+		WHERE id = %s AND NOW() < closes
+		""",
+		[deliveryId]
+	)
+	results = cursor.fetchall()
+	cursor.close()
+
+	count = results[0][0]
+	return count > 0
+
+@with_rollback
 def add_order(details):
 	cursor = CONN.cursor()
 	cursor.execute(
