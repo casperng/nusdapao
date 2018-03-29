@@ -5,6 +5,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 import logging
 import database
 import notifications
+import pytz
 from datetime import date, datetime, timedelta
 
 ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nJoin the delivery with code %s'
@@ -13,7 +14,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 					level=logging.INFO)
 
 logger = logging.getLogger(__name__)
-
 
 ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT = range(4)
 
@@ -107,9 +107,9 @@ def cancel(bot, update):
 	return ConversationHandler.END
 
 def datetime_from_text(text):
-	r_date = date.today().strftime(r" %Y %m %d")
-	r_datetime = datetime.strptime(text + r_date, r"%H%M %Y %m %d")
-	if r_datetime < datetime.now():
+	r_date = date.today().strftime(r" %Y %m %d +0800")
+	r_datetime = datetime.strptime(text + r_date, r"%H%M %Y %m %d %z")
+	if r_datetime < datetime.now(tz=pytz.UTC):
 		r_datetime += timedelta(days=1)
 	return r_datetime
 
