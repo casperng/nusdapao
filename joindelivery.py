@@ -22,7 +22,6 @@ def join_delivery(bot, update, chat_data):
 
 	return DELIVERY_ID
 
-
 def delivery_id(bot, update, chat_data):
 	if update.message.text.lower() == 'cancel':
 		return ConversationHandler.END

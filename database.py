@@ -109,6 +109,46 @@ def get_orders(deliveryid):
 	return list(map(repack, results))
 
 @with_rollback
+def get_user_orders(deliveryid, userid):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+		SELECT id, username, method, remarks, qty FROM orders
+		WHERE deliveryid = %s AND userid = %s
+		""",
+		[deliveryid, userid]
+	)
+	results = cursor.fetchall()
+	cursor.close()
+
+	def repack(row):
+		orderid, username, method, remarks, qty = row
+		return {
+			'id': orderid,
+			'username': username,
+			'method': method,
+			'remarks': remarks,
+			'qty': qty
+		}
+
+	return list(map(repack, results))
+
+@with_rollback
+def delete_user_order(userid, orderid):
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+		DELETE FROM orders
+		WHERE id = %s AND userid = %s
+		""",
+		[orderid, userid]
+	)
+	results = cursor.fetchall()
+	CONN.commit()
+	cursor.close()
+	return True
+
+@with_rollback
 def get_users(deliveryid):
 	cursor = CONN.cursor()
 	cursor.execute(
