@@ -24,6 +24,8 @@ def join_delivery(bot, update, chat_data):
 
 
 def delivery_id(bot, update, chat_data):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
 	user = update.message.from_user
 
 	deliveryId = update.message.text
@@ -46,6 +48,8 @@ def delivery_id(bot, update, chat_data):
 	return QUANTITY
 
 def quantity(bot, update, chat_data):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
 	user = update.message.from_user
 
 	logger.info("%s for quantity: %s", user.first_name, update.message.text)
@@ -57,6 +61,8 @@ def quantity(bot, update, chat_data):
 	return PAYMENT_METHOD
 
 def payment_method(bot, update, chat_data):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
 	user = update.message.from_user
 
 	logger.info("%s payment method: %s", user.first_name, update.message.text)
@@ -68,6 +74,8 @@ def payment_method(bot, update, chat_data):
 	return REMARKS
 
 def remarks(bot, update, chat_data):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
 	user = update.message.from_user
 
 	remarks = update.message.text

@@ -28,6 +28,9 @@ def start_delivery(bot, update, chat_data):
 	return ORDERING_FROM
 
 def ordering_from(bot, update, chat_data):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
+
 	user = update.message.from_user
 
 	chat_data[user.id]['location'] = update.message.text
@@ -39,6 +42,8 @@ def ordering_from(bot, update, chat_data):
 	return ORDER_CLOSE
 
 def order_close(bot, update, chat_data):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
 	user = update.message.from_user
 
 	try:
@@ -55,6 +60,8 @@ def order_close(bot, update, chat_data):
 	return ARRIVAL_TIME
 
 def arrival_time(bot, update, chat_data):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
 	user = update.message.from_user
 
 	try:
@@ -71,6 +78,8 @@ def arrival_time(bot, update, chat_data):
 	return PICK_UP_POINT
 
 def pick_up_point(bot, update, chat_data, job_queue):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
 	user = update.message.from_user
 
 	chat_data[user.id]['pickup'] = update.message.text

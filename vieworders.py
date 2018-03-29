@@ -23,6 +23,9 @@ def view_orders(bot, update):
 
 
 def delivery_id(bot, update):
+	if update.message.text.lower() == 'cancel':
+		return ConversationHandler.END
+	
 	deliveryId = update.message.text
 	if not database.is_valid_delivery_id(deliveryId):
 		update.message.reply_text(
