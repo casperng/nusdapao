@@ -10,7 +10,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-DELIVERY_ID, ITEM_INDEX = range(1)
+DELIVERY_ID, ITEM_INDEX = range(2)
 
 ORDER_MESSAGE_TEMPLATE = "Give the number of the order that you want to remove:\n"
 ORDER_ITEM_MESSAGE_TEMPLATE = "{qty} ({remarks}) - {username} [{method}]\n"
@@ -23,9 +23,6 @@ def remove_order(bot, update):
 
 
 def delivery_id(bot, update, chat_data):
-    if update.message.text.lower() == 'cancel':
-        return ConversationHandler.END
-
     deliveryId = update.message.text
     if not database.is_open_delivery_id(deliveryId):
         update.message.reply_text(
@@ -66,6 +63,8 @@ def item_index(bot, update, chat_data):
     return ConversationHandler.END
 
 def cancel(bot, update):
+    update.message.reply_text(
+        "Your order removal has been cancelled!")
     return ConversationHandler.END
 
 
