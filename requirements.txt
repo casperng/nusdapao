@@ -1,2 +1,3 @@
 python-telegram-bot
 pg8000
+pytz
