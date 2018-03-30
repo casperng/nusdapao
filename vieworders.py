@@ -23,7 +23,7 @@ def delivery_id(bot, update):
 	deliveryId = update.message.text
 	if not database.is_valid_delivery_id(deliveryId):
 		update.message.reply_text(
-			'Invalid delivery ID, please try again')
+			'Invalid delivery ID, please enter another ID')
 		return DELIVERY_ID
 
 	orders = database.get_orders(deliveryId)

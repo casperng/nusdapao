@@ -27,9 +27,15 @@ def remove_order(bot, update):
 def delivery_id(bot, update, user_data):
     utilities.pop_all_keys(user_data)
     deliveryId = update.message.text
-    if not database.is_open_delivery_id(deliveryId):
+
+    if not database.is_valid_delivery_id(deliveryId):
         update.message.reply_text(
-            'Invalid delivery ID, please try again. Check if the delivery has closed')
+            'Invalid delivery ID, please enter a valid ID.')
+        return DELIVERY_ID
+
+    if not database.is_order_open(deliveryId):
+        update.message.reply_text(
+            'Sorry, the order has already closed.')
         return DELIVERY_ID
 
     orders = database.get_user_orders(deliveryId, update.message.from_user.id)

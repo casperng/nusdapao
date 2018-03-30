@@ -30,10 +30,15 @@ def close_order(bot, update, job_queue):
 
 def delivery_id(bot, update, job_queue):
     deliveryid = update.message.text
-    if not database.is_open_delivery_id(deliveryid):
+    if not database.is_valid_delivery_id(deliveryid):
         update.message.reply_text(
-            'Invalid delivery ID, please try again. Perhaps the delivery has already been closed')
+            'Invalid delivery ID, please try again. Please enter a valid ID')
         return DELIVERY_ID
+
+    if not database.is_order_open(deliveryid):
+        update.message.reply_text(
+            'The order for this delivery is already closed!')
+        return ConversationHandler.END
 
     database.close_order_for_delivery(update.message.from_user.id, deliveryid)
     notify_closed_for_delivery(job_queue, deliveryid)

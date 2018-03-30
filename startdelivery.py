@@ -111,7 +111,7 @@ def register_delivery(bot, update, user_data, job_queue):
 
 	logger.info("%s Pickup point: %s", user.first_name, update.message.text)
 	update.message.reply_text(
-		'Thank you, your delivery has been registered!')
+		'Thank you, your delivery has been registered! Its ID is %s' % str(deliveryId))
 
 	# send message to group chat
 	bot.send_message(
