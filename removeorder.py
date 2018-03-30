@@ -43,8 +43,8 @@ def delivery_id(bot, update, user_data):
             reply += str(i) + '. ' + ORDER_ITEM_MESSAGE_TEMPLATE.format(**order)
         else:
             reply += str(i) + '. ' + ORDER_ITEM_MESSAGE_NO_REMARKS_TEMPLATE.format(**order)
-        i += 1
         order_list[i] = order
+        i += 1
 
     user_data['order_list'] = order_list
 

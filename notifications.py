@@ -2,6 +2,7 @@ from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMa
 from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, RegexHandler,
 						  ConversationHandler)
 
+import os
 import logging
 import database
 import utilities
@@ -23,7 +24,8 @@ def notify_close(bot, job):
 
 
 def notify_arrival_soon(bot, job):
-    text = 'The order for {location} will arrive in 15 minutes! The pickup point is at {pickup}'.format(**job.context)
+    text = 'The order for {location} will arrive in {arrival_time} minutes! The pickup point is at {pickup}'.format(
+        **job.context, arrival_time=os.environ.get('ARRIVAL_ADVANCE_NOTIFICATION_TIME', '15'))
 
     def notify_user(userid):
         bot.send_message(userid, text=text)
