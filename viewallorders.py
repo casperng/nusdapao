@@ -13,12 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 def view_all_orders(bot, update):
-    return ConversationHandler.END
-
-
-view_all_orders_conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('viewallorders', view_all_orders)],
-	states={
-	},
-	per_chat=False
-)
+    deliveries = database.get_all_orders()
+    bot.send_message(update.message.from_user.id,
+                     utilities.build_view_all_orders_string(deliveries))
