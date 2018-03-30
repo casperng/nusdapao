@@ -76,5 +76,6 @@ remove_order_conv_handler = ConversationHandler(
         ITEM_INDEX: [MessageHandler(Filters.text, item_index, pass_chat_data=True),
                      CommandHandler('cancel', cancel)],
     },
-    fallbacks=[CommandHandler('cancel', cancel)]
+    fallbacks=[CommandHandler('cancel', cancel)],
+	per_chat=False
 )

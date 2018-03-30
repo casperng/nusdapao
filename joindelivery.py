@@ -158,5 +158,6 @@ join_delivery_conv_handler = ConversationHandler(
 					   CommandHandler('remarks', edit_choice, pass_chat_data=True),
 					   CommandHandler('method', edit_choice, pass_chat_data=True)]
 	},
-	fallbacks=[CommandHandler('cancel', cancel)]
+	fallbacks=[CommandHandler('cancel', cancel)],
+	per_chat=False
 )

@@ -45,5 +45,6 @@ view_orders_conv_handler = ConversationHandler(
 		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id),
 					  CommandHandler('cancel', cancel)],
 	},
-	fallbacks=[CommandHandler('cancel', cancel)]
+	fallbacks=[CommandHandler('cancel', cancel)],
+	per_chat=False
 )
