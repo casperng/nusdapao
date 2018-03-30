@@ -6,6 +6,7 @@ import logging
 import database
 import notifications
 import pytz
+import os
 from datetime import date, datetime, timedelta
 
 ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nJoin the delivery with code %s'
@@ -97,7 +98,7 @@ def pick_up_point(bot, update, chat_data, job_queue):
 		name= str(deliveryId) + '_close_job')
 	job2 = job_queue.run_once(
 		notifications.notify_arrival_soon,
-		delivery['arrival'].astimezone().replace(tzinfo=None) - timedelta(minutes=15),
+		delivery['arrival'].astimezone().replace(tzinfo=None) - timedelta(minutes=int(os.environ.get('ARRIVAL_ADVANCE_NOTIFICATION_TIME', '15'))),
 		context=delivery)
 	job3 = job_queue.run_once(
 		notifications.notify_arrival,
