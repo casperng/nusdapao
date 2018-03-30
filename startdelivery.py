@@ -233,8 +233,8 @@ def send_confirmation(bot, update, user_data):
 	text = "Reply /yes to confirm your details, or click on the headers to edit them:\n" \
 		   "/from: " + user_data['location'] + "\n" \
 		   "/dish: " + user_data['dish'] + "\n" \
-		   "/price: " + user_data['price'] + "\n" \
-		   "/markup: " + user_data['markup'] + "\n" \
+		   "/price: " + str(user_data['price']) + "\n" \
+		   "/markup: " + str(user_data['markup']) + "\n" \
 		   "/closing: " + utilities.build_date_string(user_data['closes']) + "\n" \
 		   "/arriving: " + utilities.build_date_string(user_data['arrival']) + "\n" \
 		   "/pickup: " + user_data['pickup']
@@ -286,8 +286,8 @@ start_delivery_conv_handler = ConversationHandler(
 					   CommandHandler('pickup', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('arriving', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('closing', edit_choice, pass_job_queue=True, pass_user_data=True),
-					   CommandHandler('markup', mark_up, pass_job_queue=True, pass_user_data=True),
-					   CommandHandler('price', price, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('markup', edit_choice, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('price', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('from', edit_choice, pass_job_queue=True, pass_user_data=True)]
 	},
 	fallbacks=[CommandHandler('cancel', cancel)],
