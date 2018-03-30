@@ -14,5 +14,7 @@ logger = logging.getLogger(__name__)
 
 def view_all_orders(bot, update):
     deliveries = database.get_all_orders()
+    text = utilities.build_view_all_orders_string(deliveries)
+    logger.info("All orders: " + text)
     bot.send_message(update.message.from_user.id,
-                     utilities.build_view_all_orders_string(deliveries))
+                     text)
