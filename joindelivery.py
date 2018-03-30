@@ -92,9 +92,7 @@ def remarks(bot, update, user_data):
 
 
 def register_order(bot, update, user_data):
-	user = update.message.from_user
-	order = user_data.pop(user.id)
-	database.add_order(order)
+	database.add_order(user_data)
 	update.message.reply_text(
 		'Your order has been registered!')
 	return ConversationHandler.END
@@ -120,7 +118,6 @@ def edit_choice(bot, update, user_data):
 
 def send_confirmation(bot, update, user_data):
 	user_data['confirmation'] = True
-	userid = update.message.from_user.id
 	text = "Reply /yes to confirm your details, or click on the headers to edit them:\n" \
 		   "/quantity: " + user_data['qty'] + "\n" \
 		   "/remarks: " + user_data['remarks'] + "\n" \
