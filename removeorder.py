@@ -47,14 +47,17 @@ def delivery_id(bot, update, user_data):
 
     user_data['order_list'] = order_list
 
+    logger.info("Order list: %s", order_list)
+
     update.message.reply_text(
         reply)
     return ITEM_INDEX
 
 def item_index(bot, update, user_data):
     try:
-        order = user_data['order_list'][int(update.message.reply_text) - 1]
-    except:
+        order = user_data['order_list'][int(update.message.reply_text)]
+    except Exception as e:
+        logger.error(str(e))
         update.message.reply_text(
             "Invalid item number. Please try again")
         return ITEM_INDEX
