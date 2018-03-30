@@ -36,7 +36,7 @@ def delivery_id(bot, update, user_data):
     if not database.is_order_open(deliveryId):
         update.message.reply_text(
             'Sorry, the order has already closed.')
-        return DELIVERY_ID
+        return ConversationHandler.END
 
     orders = database.get_user_orders(deliveryId, update.message.from_user.id)
     logger.info("Remove order for %s: %s", deliveryId, orders)

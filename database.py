@@ -217,14 +217,14 @@ def is_order_open(deliveryid):
 	cursor.execute(
 		"""
         SELECT COUNT(*) FROM deliveries
-        WHERE id = %s  
+        WHERE id = %s AND closes > NOW()
         """,
 		[deliveryid]
 	)
 	results = cursor.fetchall()
 	cursor.close()
 
-	return results
+	return results[0][0] > 0
 
 @with_rollback
 def has_active_deliveries():
