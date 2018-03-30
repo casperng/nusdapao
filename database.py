@@ -30,11 +30,11 @@ def start_delivery(details):
 	cursor = CONN.cursor()
 	cursor.execute(
 		"""
-		INSERT INTO deliveries (chat, userid, dish, price, markup, location, closes, arrival, pickup)
-		VALUES (%s, %s, %s, %s, %s, %s) RETURNING id
+		INSERT INTO deliveries (chat, userid, dish, price, markup, location, closes, arrival, pickup, username)
+		VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
 		""",
 		[details['chat'], details['user'], details['dish'], details['price'], details['markup'],
-		 details['location'], details['closes'], details['arrival'], details['pickup']]
+		 details['location'], details['closes'], details['arrival'], details['pickup'], details['username']]
 	)
 	results = cursor.fetchall()
 	CONN.commit()
@@ -239,14 +239,15 @@ def get_all_orders():
 					'dish': row[7],
 					'price': row[8],
 					'markup': row[9],
+					'username': row[10],
 					'orders': []
 				}
-			result[row[0]].append(
+			result[row[0]]['orders'].append(
 				{
-					'username': row[13],
-					'method': row[14],
-					'remarks': row[15],
-					'qty': row[16]
+					'username': row[14],
+					'method': row[15],
+					'remarks': row[16],
+					'qty': row[17]
 				}
 			)
 

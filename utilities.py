@@ -16,12 +16,12 @@ def build_view_orders_string(orders):
 def build_view_all_orders_string(deliveries):
     result = ""
     for code, delivery in deliveries.items():
-        result +=       'Delivery for {dish} from {location} by {user}\n' \
+        result +=       'Delivery {id} for {dish} from {location} by {username}\n' \
 				        'Price: {price}\n' \
 						'Markup: {markup}\n' \
 						'Closing: {closes}\n' \
 						'Arriving: {arrival}\n' \
-						'Pickup: {pickup}\n'.format(**delivery)
+						'Pickup: {pickup}\n'.format(**delivery, id=code)
         result += build_view_orders_string(delivery['orders']) + '\n'
     return result
 
