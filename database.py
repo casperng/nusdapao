@@ -183,7 +183,7 @@ def close_order_for_delivery(userid, deliveryid):
 	return True
 
 @with_rollback
-def delete_user_order(userid, orderid):
+def delete_user_order(orderid, userid):
 	cursor = CONN.cursor()
 	cursor.execute(
 		"""
@@ -192,7 +192,6 @@ def delete_user_order(userid, orderid):
 		""",
 		[orderid, userid]
 	)
-	results = cursor.fetchall()
 	CONN.commit()
 	cursor.close()
 	return True

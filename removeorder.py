@@ -63,7 +63,7 @@ def item_index(bot, update, user_data):
             "Invalid item number. Please try again")
         return ITEM_INDEX
 
-    database.delete_user_order(update.message.from_user.id, order['id'])
+    database.delete_user_order(order['id'], update.message.from_user.id)
     update.message.reply_text(
         "Your order has been removed!")
 
