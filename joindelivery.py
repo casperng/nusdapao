@@ -4,6 +4,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 						  ConversationHandler)
 
 import database
+import utilities
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					level=logging.INFO)
@@ -14,6 +15,7 @@ DELIVERY_ID, QUANTITY, PAYMENT_METHOD, REMARKS, CONFIRMATION = range(5)
 
 
 def join_delivery(bot, update, user_data):
+	utilities.pop_all_keys(user_data)
 	user_data['userid'] = update.message.from_user.id
 	user_data['username'] = update.message.from_user.first_name
 	user_data['confirmation'] = False

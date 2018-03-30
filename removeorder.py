@@ -5,6 +5,8 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 import database
 
+import utilities
+
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
@@ -23,6 +25,7 @@ def remove_order(bot, update):
 
 
 def delivery_id(bot, update, user_data):
+    utilities.pop_all_keys(user_data)
     deliveryId = update.message.text
     if not database.is_open_delivery_id(deliveryId):
         update.message.reply_text(

@@ -13,5 +13,11 @@ def build_view_orders_string(orders):
 
     return reply
 
+
 def build_date_string(datetime):
     return datetime.strftime("%H:%M %d/%m/%y")
+
+
+def pop_all_keys(dct):
+    for key in list(dct.keys()):
+        del dct[key]
