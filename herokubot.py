@@ -1,14 +1,43 @@
 import logging
 import os
 
+from telegram import (ReplyKeyboardMarkup, ReplyKeyboardRemove, InlineKeyboardMarkup, InlineKeyboardButton)
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.error import (TelegramError, Unauthorized, BadRequest,
+                            TimedOut, ChatMigrated, NetworkError)
 import startdelivery, joindelivery, vieworders, removeorder, closeorder
 
 def start(bot, update):
 	update.effective_message.reply_text("Hi!")
 
 def error(bot, update, error):
-	logger.warning('Update "%s" caused error "%s"', update, error)
+	try:
+		raise error
+	except Unauthorized:
+		if update.message.from_user.id != update.message.chat_id:
+			bot.send_message(update.message.chat_id,
+							 "You have to start a conversation with me first!",
+							 reply_markup=InlineKeyboardMarkup([[
+								 InlineKeyboardButton(text="Start!",
+													  url="https://telegram.me/" + os.environ.get('BOT_NAME', 'nusdapao_bot'))
+							 ]]))
+		return
+	except BadRequest:
+		# handle malformed requests - read more below!
+		return
+	except TimedOut:
+		# handle slow connection problems
+		return
+	except NetworkError:
+		# handle other connection problems
+		return
+	except ChatMigrated as e:
+		# the chat_id of a group has changed, use e.new_chat_id instead
+		return
+	except TelegramError:
+		# handle all other telegram related errors
+		return
+
 
 if __name__ == "__main__":
 	# Set these variable to the appropriate values
