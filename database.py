@@ -194,10 +194,8 @@ def get_users(deliveryid):
 	cursor = CONN.cursor()
 	cursor.execute(
 		"""
-        SELECT DISTINCT t2.userid FROM orders t2
-        INNER JOIN deliveries t1
-        ON t1.id = t2.deliveryid
-        WHERE t1.id = %s
+        SELECT DISTINCT userid FROM orders
+        WHERE deliveryid = %s
         """,
 		[deliveryid]
 	)

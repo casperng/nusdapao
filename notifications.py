@@ -5,7 +5,6 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 import logging
 import database
 import utilities
-import notifications
 from datetime import date, datetime, timedelta
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,6 +29,7 @@ def notify_arrival_soon(bot, job):
         bot.send_message(userid, text=text)
 
     users = database.get_users(job.context['id'])
+    logger.info("Notifying users of arrival soon %s", users)
     map(notify_user, users)
 
 
@@ -40,4 +40,5 @@ def notify_arrival(bot, job):
         bot.send_message(userid, text=text)
 
     users = database.get_users(job.context['id'])
+    logger.info("Notifying users of arrival %s", users)
     map(notify_user, users)
