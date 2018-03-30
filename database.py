@@ -1,5 +1,11 @@
 import os
 import pg8000
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+					level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 CONN = pg8000.connect(
 	database=os.environ.get('DATABASE_NAME'),
@@ -9,11 +15,13 @@ CONN = pg8000.connect(
 	# port=os.environ.get('DATABASE_PORT')
 )
 
+
 def with_rollback(fn):
 	def wrapped(*args, **kwargs):
 		try:
 			return fn(*args, **kwargs)
-		except pg8000.Error:
+		except pg8000.Error as e:
+			logger.error(str(e))
 			CONN.rollback()
 	return wrapped
 
