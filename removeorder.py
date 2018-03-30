@@ -22,7 +22,7 @@ def remove_order(bot, update):
     return DELIVERY_ID
 
 
-def delivery_id(bot, update, chat_data):
+def delivery_id(bot, update, user_data):
     deliveryId = update.message.text
     if not database.is_open_delivery_id(deliveryId):
         update.message.reply_text(
@@ -42,15 +42,15 @@ def delivery_id(bot, update, chat_data):
             reply += str(i) + '. ' + ORDER_ITEM_MESSAGE_NO_REMARKS_TEMPLATE.format(**order)
         order_list[i] = order
 
-    chat_data['order_list'] = order_list
+    user_data['order_list'] = order_list
 
     update.message.reply_text(
         reply)
     return ITEM_INDEX
 
-def item_index(bot, update, chat_data):
+def item_index(bot, update, user_data):
     try:
-        order = chat_data['order_list'][int(update.message.reply_text) - 1]
+        order = user_data['order_list'][int(update.message.reply_text) - 1]
     except:
         update.message.reply_text(
             "Invalid item number. Please try again")
@@ -71,9 +71,9 @@ def cancel(bot, update):
 remove_order_conv_handler = ConversationHandler(
     entry_points=[CommandHandler('removeorder', remove_order)],
     states={
-        DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_chat_data=True),
+        DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_user_data=True),
                       CommandHandler('cancel', cancel)],
-        ITEM_INDEX: [MessageHandler(Filters.text, item_index, pass_chat_data=True),
+        ITEM_INDEX: [MessageHandler(Filters.text, item_index, pass_user_data=True),
                      CommandHandler('cancel', cancel)],
     },
     fallbacks=[CommandHandler('cancel', cancel)],

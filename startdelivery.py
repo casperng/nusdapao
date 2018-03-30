@@ -20,27 +20,29 @@ logger = logging.getLogger(__name__)
 ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT, CONFIRMATION = range(5)
 
 
-def start_delivery(bot, update, chat_data):
-	chat_data[update.message.from_user.id] = {
+def start_delivery(bot, update, user_data):
+	user_data = {
 		'chat': update.message.chat_id,
 		'user': update.message.from_user.id,
+		'confirmation': False
 	}
-	chat_data['confirmation'] =  False
+
+	logger.info("Current user_data: %s", user_data)
 
 	bot.send_message(update.message.from_user.id, 'Hi! Where are you ordering food from? Send /cancel to cancel this request anytime')
 
 	return ORDERING_FROM
 
 
-def ordering_from(bot, update, chat_data):
+def ordering_from(bot, update, user_data):
 	user = update.message.from_user
 
-	chat_data[user.id]['location'] = update.message.text
+	user_data['location'] = update.message.text
 
 	logger.info("%s Ordering from: %s", user.first_name, update.message.text)
 
-	if chat_data['confirmation']:
-		return send_confirmation(bot, update, chat_data)
+	if user_data['confirmation']:
+		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
 		'What time will the order close? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
@@ -48,11 +50,11 @@ def ordering_from(bot, update, chat_data):
 	return ORDER_CLOSE
 
 
-def order_close(bot, update, chat_data):
+def order_close(bot, update, user_data):
 	user = update.message.from_user
 
 	try:
-		chat_data[user.id]['closes'] = datetime_from_text(update.message.text)
+		user_data['closes'] = datetime_from_text(update.message.text)
 	except:
 		update.message.reply_text(
 		'Invalid close time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
@@ -60,8 +62,8 @@ def order_close(bot, update, chat_data):
 
 	logger.info("%s Order closes: %s", user.first_name, update.message.text)
 
-	if chat_data['confirmation']:
-		return send_confirmation(bot, update, chat_data)
+	if user_data['confirmation']:
+		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
 		'What time will the order arrive? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
@@ -69,11 +71,11 @@ def order_close(bot, update, chat_data):
 	return ARRIVAL_TIME
 
 
-def arrival_time(bot, update, chat_data):
+def arrival_time(bot, update, user_data):
 	user = update.message.from_user
 
 	try:
-		chat_data[user.id]['arrival'] = datetime_from_text(update.message.text)
+		user_data['arrival'] = datetime_from_text(update.message.text)
 	except:
 		update.message.reply_text(
 		'Invalid arrival time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
@@ -81,8 +83,8 @@ def arrival_time(bot, update, chat_data):
 
 	logger.info("%s Arrival time: %s", user.first_name, update.message.text)
 
-	if chat_data['confirmation']:
-		return send_confirmation(bot, update, chat_data)
+	if user_data['confirmation']:
+		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
 		'Where is the pickup point?')
@@ -90,17 +92,17 @@ def arrival_time(bot, update, chat_data):
 	return PICK_UP_POINT
 
 
-def pick_up_point(bot, update, chat_data):
+def pick_up_point(bot, update, user_data):
 	user = update.message.from_user
 
-	chat_data[user.id]['pickup'] = update.message.text
+	user_data['pickup'] = update.message.text
 
-	return send_confirmation(bot, update, chat_data)
+	return send_confirmation(bot, update, user_data)
 
 
-def register_delivery(bot, update, chat_data, job_queue):
+def register_delivery(bot, update, user_data, job_queue):
 	user = update.message.from_user
-	delivery = chat_data[user.id]
+	delivery = user_data
 
 	deliveryId = database.start_delivery(delivery)
 	delivery['id'] = deliveryId
@@ -135,10 +137,10 @@ def register_delivery(bot, update, chat_data, job_queue):
 	return ConversationHandler.END
 
 
-def edit_choice(bot, update, chat_data, job_queue):
+def edit_choice(bot, update, user_data, job_queue):
 	choice = update.message.text
 	if choice == '/yes':
-		return register_delivery(bot, update, chat_data, job_queue)
+		return register_delivery(bot, update, user_data, job_queue)
 	elif choice == '/from':
 		update.message.reply_text("Please enter the new location")
 		return ORDERING_FROM
@@ -156,14 +158,14 @@ def edit_choice(bot, update, chat_data, job_queue):
 		return CONFIRMATION
 
 
-def send_confirmation(bot, update, chat_data):
-	chat_data['confirmation'] = True
+def send_confirmation(bot, update, user_data):
+	user_data['confirmation'] = True
 	userid = update.message.from_user.id
 	text = "Reply /yes to confirm your details, or click on the headers to edit them:\n" \
-		   "/from: " + chat_data[userid]['location'] + "\n" \
-		   "/closing: " + utilities.build_date_string(chat_data[userid]['closes']) + "\n" \
-		   "/arriving: " + utilities.build_date_string(chat_data[userid]['arrival']) + "\n" \
-		   "/pickup: " + chat_data[userid]['pickup']
+		   "/from: " + user_data['location'] + "\n" \
+		   "/closing: " + utilities.build_date_string(user_data['closes']) + "\n" \
+		   "/arriving: " + utilities.build_date_string(user_data['arrival']) + "\n" \
+		   "/pickup: " + user_data['pickup']
 	update.message.reply_text(text)
 	return CONFIRMATION
 
@@ -185,25 +187,25 @@ def datetime_from_text(text):
 
 
 start_delivery_conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('startdelivery', start_delivery, pass_chat_data=True)],
+	entry_points=[CommandHandler('startdelivery', start_delivery, pass_user_data=True)],
 	states={
-		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from, pass_chat_data=True),
+		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from, pass_user_data=True),
 						CommandHandler('cancel', cancel)],
 
-		ORDER_CLOSE: [MessageHandler(Filters.text, order_close, pass_chat_data=True),
+		ORDER_CLOSE: [MessageHandler(Filters.text, order_close, pass_user_data=True),
 					  CommandHandler('cancel', cancel)],
 
-		ARRIVAL_TIME: [MessageHandler(Filters.text, arrival_time, pass_chat_data=True),
+		ARRIVAL_TIME: [MessageHandler(Filters.text, arrival_time, pass_user_data=True),
 					   CommandHandler('cancel', cancel)],
 
-		PICK_UP_POINT: [MessageHandler(Filters.text, pick_up_point, pass_chat_data=True),
+		PICK_UP_POINT: [MessageHandler(Filters.text, pick_up_point, pass_user_data=True),
 						CommandHandler('cancel', cancel)],
 
-		CONFIRMATION: [CommandHandler('yes', edit_choice, pass_job_queue=True, pass_chat_data=True),
-					   CommandHandler('pickup', edit_choice, pass_job_queue=True, pass_chat_data=True),
-					   CommandHandler('arriving', edit_choice, pass_job_queue=True, pass_chat_data=True),
-					   CommandHandler('closing', edit_choice, pass_job_queue=True, pass_chat_data=True),
-					   CommandHandler('from', edit_choice, pass_job_queue=True, pass_chat_data=True)]
+		CONFIRMATION: [CommandHandler('yes', edit_choice, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('pickup', edit_choice, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('arriving', edit_choice, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('closing', edit_choice, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('from', edit_choice, pass_job_queue=True, pass_user_data=True)]
 	},
 	fallbacks=[CommandHandler('cancel', cancel)],
 	per_chat=False
