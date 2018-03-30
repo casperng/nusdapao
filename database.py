@@ -213,6 +213,48 @@ def get_users(deliveryid):
 	return [row[0] for row in results]
 
 @with_rollback
+def get_all_orders():
+	cursor = CONN.cursor()
+	cursor.execute(
+		"""
+        SELECT * FROM deliveries t1
+        INNER JOIN orders t2
+        ON t1.id = t2.deliveryid
+        WHERE t1.closes > NOW()
+        """
+	)
+	results = cursor.fetchall()
+	cursor.close()
+
+	def repack(rows):
+		result = {}
+		for row in rows:
+			if row[0] not in result:
+				result[row[0]] = {
+					'user': row[2],
+					'location': row[3],
+					'closes': row[4],
+					'arrival': row[5],
+					'pickup': row[6],
+					'dish': row[7],
+					'price': row[8],
+					'markup': row[9],
+					'orders': []
+				}
+			result[row[0]].append(
+				{
+					'username': row[13],
+					'method': row[14],
+					'remarks': row[15],
+					'qty': row[16]
+				}
+			)
+
+		return result
+
+	return repack(results)
+
+@with_rollback
 def is_order_open(deliveryid):
 	cursor = CONN.cursor()
 	cursor.execute(

@@ -13,6 +13,18 @@ def build_view_orders_string(orders):
 
     return reply
 
+def build_view_all_orders_string(deliveries):
+    result = ""
+    for code, delivery in deliveries.items():
+        result +=       'Delivery for {dish} from {location} by {user}\n' \
+				        'Price: {price}\n' \
+						'Markup: {markup}\n' \
+						'Closing: {closes}\n' \
+						'Arriving: {arrival}\n' \
+						'Pickup: {pickup}\n'.format(**delivery)
+        result += build_view_orders_string(delivery['orders']) + '\n'
+    return result
+
 
 def build_date_string(datetime):
     return datetime.strftime("%H:%M %d/%m/%y")
