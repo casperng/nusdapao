@@ -44,7 +44,7 @@ def delivery_id(bot, update, job_queue):
 
 
 def notify_closed_for_delivery(job_queue, deliveryid):
-    job = job_queue.get_jobs_by_name(str(deliveryid) + '_close_job')
+    job = job_queue.get_jobs_by_name(str(deliveryid) + '_close_job')[0]
     job.run(job_queue.bot)
 
 
