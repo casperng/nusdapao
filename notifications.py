@@ -30,8 +30,9 @@ def notify_arrival_soon(bot, job):
 
     users = database.get_users(job.context['id'])
     logger.info("Notifying users of arrival soon %s", users)
-    map(notify_user, users)
 
+    for user in users:
+        notify_user(user)
 
 def notify_arrival(bot, job):
     text = 'The order for {location} is arriving! The pickup point is at {pickup}'.format(**job.context)
@@ -41,4 +42,6 @@ def notify_arrival(bot, job):
 
     users = database.get_users(job.context['id'])
     logger.info("Notifying users of arrival %s", users)
-    map(notify_user, users)
+
+    for user in users:
+        notify_user(user)
