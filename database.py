@@ -178,7 +178,6 @@ def close_order_for_delivery(userid, deliveryid):
         """,
 		[deliveryid, userid]
 	)
-	results = cursor.fetchall()
 	CONN.commit()
 	cursor.close()
 	return True
