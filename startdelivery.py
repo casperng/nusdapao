@@ -104,7 +104,7 @@ def pick_up_point(bot, update, user_data):
 
 def register_delivery(bot, update, user_data, job_queue):
 	user = update.message.from_user
-	delivery = user_data
+	delivery = { k: v for k, v in user_data.items() }
 
 	deliveryId = database.start_delivery(delivery)
 	delivery['id'] = deliveryId
