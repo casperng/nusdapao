@@ -24,7 +24,7 @@ def start_delivery(bot, update, chat_data):
 		'user': update.message.from_user.id
 	}
 
-	bot.send_message(update.message.from_user.id, 'Hi! Where are you ordering food from?')
+	bot.send_message(update.message.from_user.id, 'Hi! Where are you ordering food from? Send /cancel to cancel this request anytime')
 
 	return ORDERING_FROM
 
@@ -127,13 +127,17 @@ def datetime_from_text(text):
 start_delivery_conv_handler = ConversationHandler(
 	entry_points=[CommandHandler('startdelivery', start_delivery, pass_chat_data=True)],
 	states={
-		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from, pass_chat_data=True)],
+		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from, pass_chat_data=True),
+						CommandHandler('cancel', cancel)],
 
-		ORDER_CLOSE: [MessageHandler(Filters.text, order_close, pass_chat_data=True)],
+		ORDER_CLOSE: [MessageHandler(Filters.text, order_close, pass_chat_data=True),
+					  CommandHandler('cancel', cancel)],
 
-		ARRIVAL_TIME: [MessageHandler(Filters.text, arrival_time, pass_chat_data=True)],
+		ARRIVAL_TIME: [MessageHandler(Filters.text, arrival_time, pass_chat_data=True),
+					   CommandHandler('cancel', cancel)],
 
-		PICK_UP_POINT: [MessageHandler(Filters.text, pick_up_point, pass_job_queue=True, pass_chat_data=True)]
+		PICK_UP_POINT: [MessageHandler(Filters.text, pick_up_point, pass_job_queue=True, pass_chat_data=True),
+						CommandHandler('cancel', cancel)]
 	},
 	fallbacks=[CommandHandler('cancel', cancel)]
 )

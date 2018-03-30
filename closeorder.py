@@ -23,7 +23,7 @@ def close_order(bot, update, job_queue):
         notify_closed_for_delivery(job_queue, deliveryid)
         return ConversationHandler.END
 
-    bot.send_message(user_id, 'What delivery ID are you closing orders for?')
+    bot.send_message(user_id, 'What delivery ID are you closing orders for? Send /cancel to cancel this request anytime')
 
     return DELIVERY_ID
 
@@ -57,7 +57,8 @@ def cancel(bot, update):
 close_order_conv_handler = ConversationHandler(
     entry_points=[CommandHandler('closeorder', close_order, pass_job_queue=True)],
     states={
-        DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_job_queue=True)],
+        DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_job_queue=True),
+                      CommandHandler('cancel', cancel)],
     },
     fallbacks=[CommandHandler('cancel', cancel)]
 )

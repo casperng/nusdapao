@@ -18,7 +18,7 @@ def join_delivery(bot, update, chat_data):
 		'username': update.message.from_user.first_name
 	}
 
-	bot.send_message(update.message.from_user.id, 'What delivery ID are you ordering for?')
+	bot.send_message(update.message.from_user.id, 'What delivery ID are you ordering for? Send /cancel to cancel this request anytime')
 
 	return DELIVERY_ID
 
@@ -93,10 +93,14 @@ def cancel(bot, update):
 join_delivery_conv_handler = ConversationHandler(
 	entry_points=[CommandHandler('joindelivery', join_delivery, pass_chat_data=True)],
 	states={
-		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_chat_data=True)],
-		QUANTITY: [MessageHandler(Filters.text, quantity, pass_chat_data=True)],
-		PAYMENT_METHOD: [MessageHandler(Filters.text, payment_method, pass_chat_data=True)],
-		REMARKS: [MessageHandler(Filters.text, remarks, pass_chat_data=True)],
+		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_chat_data=True),
+					  CommandHandler('cancel', cancel)],
+		QUANTITY: [MessageHandler(Filters.text, quantity, pass_chat_data=True),
+				   CommandHandler('cancel', cancel)],
+		PAYMENT_METHOD: [MessageHandler(Filters.text, payment_method, pass_chat_data=True),
+						 CommandHandler('cancel', cancel)],
+		REMARKS: [MessageHandler(Filters.text, remarks, pass_chat_data=True),
+				  CommandHandler('cancel', cancel)],
 	},
 	fallbacks=[CommandHandler('cancel', cancel)]
 )

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 DELIVERY_ID = range(1)
 
 def view_orders(bot, update):
-	bot.send_message(update.message.from_user.id, 'What delivery ID are you checking for?')
+	bot.send_message(update.message.from_user.id, 'What delivery ID are you checking for? Send /cancel to cancel this request anytime')
 
 	return DELIVERY_ID
 
@@ -42,7 +42,8 @@ def cancel(bot, update):
 view_orders_conv_handler = ConversationHandler(
 	entry_points=[CommandHandler('vieworders', view_orders)],
 	states={
-		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id)],
+		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id),
+					  CommandHandler('cancel', cancel)],
 	},
 	fallbacks=[CommandHandler('cancel', cancel)]
 )

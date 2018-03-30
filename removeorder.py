@@ -71,8 +71,10 @@ def cancel(bot, update):
 remove_order_conv_handler = ConversationHandler(
     entry_points=[CommandHandler('removeorder', remove_order)],
     states={
-        DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_chat_data=True)],
-        ITEM_INDEX: [MessageHandler(Filters.text, item_index, pass_chat_data=True)],
+        DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_chat_data=True),
+                      CommandHandler('cancel', cancel)],
+        ITEM_INDEX: [MessageHandler(Filters.text, item_index, pass_chat_data=True),
+                     CommandHandler('cancel', cancel)],
     },
     fallbacks=[CommandHandler('cancel', cancel)]
 )
