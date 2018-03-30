@@ -34,7 +34,8 @@ def error(bot, update, error):
 	except ChatMigrated as e:
 		# the chat_id of a group has changed, use e.new_chat_id instead
 		return
-	except TelegramError:
+	except TelegramError as e:
+		logger.error(str(e))
 		# handle all other telegram related errors
 		return
 
