@@ -12,3 +12,6 @@ def build_view_orders_string(orders):
             reply += ORDER_ITEM_MESSAGE_NO_REMARKS_TEMPLATE.format(**order)
 
     return reply
+
+def build_date_string(datetime):
+    return datetime.strftime("%H:%M %d/%m/%y")

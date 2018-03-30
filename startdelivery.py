@@ -5,6 +5,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 import logging
 import database
 import notifications
+import utilities
 import pytz
 import os
 from datetime import date, datetime, timedelta
@@ -158,8 +159,8 @@ def send_confirmation(bot, update, chat_data):
 	userid = update.message.from_user.id
 	text = "Reply /yes to confirm your details, or click on the headers to edit them:\n" \
 		   "/from: " + chat_data[userid]['location'] + "\n" \
-		   "/closing: " + chat_data[userid]['closes'] + "\n" \
-		   "/arriving: " + chat_data[userid]['arrival'] + "\n" \
+		   "/closing: " + utilities.build_date_string(chat_data[userid]['closes']) + "\n" \
+		   "/arriving: " + utilities.build_date_string(chat_data[userid]['arrival']) + "\n" \
 		   "/pickup: " + chat_data[userid]['pickup']
 	update.message.reply_text(text)
 	return CONFIRMATION
