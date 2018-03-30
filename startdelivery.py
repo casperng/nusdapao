@@ -284,6 +284,7 @@ start_delivery_conv_handler = ConversationHandler(
 						CommandHandler('cancel', cancel)],
 
 		CONFIRMATION: [CommandHandler('yes', edit_choice, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('dish', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('pickup', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('arriving', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('closing', edit_choice, pass_job_queue=True, pass_user_data=True),

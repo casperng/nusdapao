@@ -13,7 +13,10 @@ def build_view_orders_string(orders):
 
     return reply
 
+
 def build_view_all_orders_string(deliveries):
+    if not deliveries:
+        return "There are no active deliveries now"
     result = ""
     for code, delivery in deliveries.items():
         result +=       'Delivery {id} for {dish} from {location} by {username}\n' \
