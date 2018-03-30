@@ -100,7 +100,7 @@ def pick_up_point(bot, update, chat_data):
 
 def register_delivery(bot, update, chat_data, job_queue):
 	user = update.message.from_user
-	delivery = chat_data['user.id']
+	delivery = chat_data[user.id]
 
 	deliveryId = database.start_delivery(delivery)
 	delivery['id'] = deliveryId
