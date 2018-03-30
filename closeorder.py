@@ -30,9 +30,9 @@ def close_order(bot, update, job_queue):
 
 def delivery_id(bot, update, job_queue):
     deliveryid = update.message.text
-    if not database.is_valid_delivery_id(deliveryid):
+    if not database.is_open_delivery_id(deliveryid):
         update.message.reply_text(
-            'Invalid delivery ID, please try again.')
+            'Invalid delivery ID, please try again. Perhaps the delivery has already been closed')
         return DELIVERY_ID
 
     database.close_order_for_delivery(update.message.from_user.id, deliveryid)
@@ -44,9 +44,11 @@ def delivery_id(bot, update, job_queue):
 
 
 def notify_closed_for_delivery(job_queue, deliveryid):
-    job = job_queue.get_jobs_by_name(str(deliveryid) + '_close_job')[0]
-    job.run(job_queue.bot)
-    job.schedule_removal()
+    jobs = job_queue.get_jobs_by_name(str(deliveryid) + '_close_job')
+    if len(jobs) >= 1:
+        job = jobs[0]
+        job.run(job_queue.bot)
+        job.schedule_removal()
 
 
 def cancel(bot, update):
