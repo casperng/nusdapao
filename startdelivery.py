@@ -21,11 +21,9 @@ ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT, CONFIRMATION = range(5)
 
 
 def start_delivery(bot, update, user_data):
-	user_data = {
-		'chat': update.message.chat_id,
-		'user': update.message.from_user.id,
-		'confirmation': False
-	}
+	user_data['chat'] = update.message.chat_id
+	user_data['user'] = update.message.from_user.id
+	user_data['confirmation'] = False
 
 	logger.info("Current user_data: %s", user_data)
 

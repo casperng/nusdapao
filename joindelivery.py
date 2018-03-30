@@ -14,11 +14,9 @@ DELIVERY_ID, QUANTITY, PAYMENT_METHOD, REMARKS, CONFIRMATION = range(5)
 
 
 def join_delivery(bot, update, user_data):
-	user_data = {
-		'userid': update.message.from_user.id,
-		'username': update.message.from_user.first_name,
-		'confirmation': False
-	}
+	user_data['userid'] = update.message.from_user.id
+	user_data['username'] = update.message.from_user.first_name
+	user_data['confirmation'] = False
 
 	bot.send_message(update.message.from_user.id, 'What delivery ID are you ordering for? Send /cancel to cancel this request anytime')
 
