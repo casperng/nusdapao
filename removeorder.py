@@ -43,6 +43,7 @@ def delivery_id(bot, update, user_data):
             reply += str(i) + '. ' + ORDER_ITEM_MESSAGE_TEMPLATE.format(**order)
         else:
             reply += str(i) + '. ' + ORDER_ITEM_MESSAGE_NO_REMARKS_TEMPLATE.format(**order)
+        i += 1
         order_list[i] = order
 
     user_data['order_list'] = order_list
@@ -55,7 +56,7 @@ def delivery_id(bot, update, user_data):
 
 def item_index(bot, update, user_data):
     try:
-        order = user_data['order_list'][int(update.message.reply_text)]
+        order = user_data['order_list'][int(update.message.text)]
     except Exception as e:
         logger.error(str(e))
         update.message.reply_text(
