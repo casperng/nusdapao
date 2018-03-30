@@ -10,14 +10,20 @@ import pytz
 import os
 from datetime import date, datetime, timedelta
 
-ORDER_CONFIRM_MESSAGE = 'Delivery for %s by %s\nClosing: %s\nArriving: %s\nPickup: %s\nJoin the delivery with code %s'
+ORDER_CONFIRM_MESSAGE = 'Delivery for {dish} from {location} by {user}\n' \
+						'Price: {price}\n' \
+						'Markup: {markup}\n' \
+						'Closing: {closes}\n' \
+						'Arriving: {arrival}\n' \
+						'Pickup: {pickup}\n' \
+						'Join the delivery with code {id}'
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
-ORDERING_FROM, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT, CONFIRMATION = range(5)
+DISH, ORDERING_FROM, PRICE, MARK_UP, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT, CONFIRMATION = range(8)
 
 
 def start_delivery(bot, update, user_data):
@@ -28,10 +34,25 @@ def start_delivery(bot, update, user_data):
 
 	logger.info("Current user_data: %s", user_data)
 
-	bot.send_message(update.message.from_user.id, 'Hi! Where are you ordering food from? Send /cancel to cancel this request anytime')
+	bot.send_message(update.message.from_user.id, 'Hi! What food are you delivering? Send /cancel to cancel this request anytime')
+
+	return DISH
+
+def dish(bot, update, user_data):
+	user = update.message.from_user
+
+	user_data['dish'] = update.message.text
+
+	logger.info("Current user_data: %s", user_data)
+	logger.info("%s dish: %s", user.first_name, update.message.text)
+
+	if user_data['confirmation']:
+		return send_confirmation(bot, update, user_data)
+
+	update.message.reply_text(
+		'Where are you ordering food from?')
 
 	return ORDERING_FROM
-
 
 def ordering_from(bot, update, user_data):
 	user = update.message.from_user
@@ -45,7 +66,45 @@ def ordering_from(bot, update, user_data):
 		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
-		'What time will the order close? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
+		'What is the price in cents?')
+
+	return PRICE
+
+def price(bot, update, user_data):
+	user = update.message.from_user
+
+	try:
+		user_data['price'] = int(update.message.text)
+	except:
+		update.message.reply_text("Please enter a valid price in cents!")
+		return PRICE
+
+	logger.info("%s Price: %s", user.first_name, update.message.text)
+
+	if user_data['confirmation']:
+		return send_confirmation(bot, update, user_data)
+
+	update.message.reply_text(
+		'What is the markup in cents?')
+
+	return MARK_UP
+
+def mark_up(bot, update, user_data):
+	user = update.message.from_user
+
+	try:
+		user_data['markup'] = int(update.message.text)
+	except:
+		update.message.reply_text("Please enter a valid markup in cents!")
+		return PRICE
+
+	logger.info("%s Markup: %s", user.first_name, update.message.text)
+
+	if user_data['confirmation']:
+		return send_confirmation(bot, update, user_data)
+
+	update.message.reply_text(
+		'What time will the order CLOSE? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
 
 	return ORDER_CLOSE
 
@@ -67,7 +126,7 @@ def order_close(bot, update, user_data):
 		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
-		'What time will the order arrive? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
+		'What time will the order ARRIVE? (Use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am)')
 
 	return ARRIVAL_TIME
 
@@ -116,8 +175,7 @@ def register_delivery(bot, update, user_data, job_queue):
 	# send message to group chat
 	bot.send_message(
 		delivery['chat'],
-		ORDER_CONFIRM_MESSAGE %
-		(delivery['location'], user.first_name, delivery['closes'], delivery['arrival'], delivery['pickup'], delivery['id'])
+		ORDER_CONFIRM_MESSAGE.format(**delivery)
 	)
 
 	job1 = job_queue.run_once(
@@ -143,6 +201,9 @@ def edit_choice(bot, update, user_data, job_queue):
 	choice = update.message.text
 	if choice == '/yes':
 		return register_delivery(bot, update, user_data, job_queue)
+	elif choice == '/dish':
+		update.message.reply_text("Please enter the new dish")
+		return DISH
 	elif choice == '/from':
 		update.message.reply_text("Please enter the new location")
 		return ORDERING_FROM
@@ -155,6 +216,12 @@ def edit_choice(bot, update, user_data, job_queue):
 	elif choice == '/pickup':
 		update.message.reply_text("Please enter the new pickup location")
 		return PICK_UP_POINT
+	elif choice == '/markup':
+		update.message.reply_text("Please enter the new markup in cents")
+		return MARK_UP
+	elif choice == '/price':
+		update.message.reply_text("Please enter the new price in cents")
+		return PRICE
 	else:
 		update.message.reply_text("Invalid command, please try again")
 		return CONFIRMATION
@@ -165,6 +232,9 @@ def send_confirmation(bot, update, user_data):
 	userid = update.message.from_user.id
 	text = "Reply /yes to confirm your details, or click on the headers to edit them:\n" \
 		   "/from: " + user_data['location'] + "\n" \
+		   "/dish: " + user_data['dish'] + "\n" \
+		   "/price: " + user_data['price'] + "\n" \
+		   "/markup: " + user_data['markup'] + "\n" \
 		   "/closing: " + utilities.build_date_string(user_data['closes']) + "\n" \
 		   "/arriving: " + utilities.build_date_string(user_data['arrival']) + "\n" \
 		   "/pickup: " + user_data['pickup']
@@ -191,8 +261,17 @@ def datetime_from_text(text):
 start_delivery_conv_handler = ConversationHandler(
 	entry_points=[CommandHandler('startdelivery', start_delivery, pass_user_data=True)],
 	states={
+		DISH: [MessageHandler(Filters.text, dish, pass_user_data=True),
+			   CommandHandler('cancel', cancel)],
+
 		ORDERING_FROM: [MessageHandler(Filters.text, ordering_from, pass_user_data=True),
 						CommandHandler('cancel', cancel)],
+
+		PRICE: [MessageHandler(Filters.text, price, pass_user_data=True),
+				CommandHandler('cancel', cancel)],
+
+		MARK_UP: [MessageHandler(Filters.text, mark_up, pass_user_data=True),
+				  CommandHandler('cancel', cancel)],
 
 		ORDER_CLOSE: [MessageHandler(Filters.text, order_close, pass_user_data=True),
 					  CommandHandler('cancel', cancel)],
@@ -207,6 +286,8 @@ start_delivery_conv_handler = ConversationHandler(
 					   CommandHandler('pickup', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('arriving', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('closing', edit_choice, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('markup', mark_up, pass_job_queue=True, pass_user_data=True),
+					   CommandHandler('price', price, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('from', edit_choice, pass_job_queue=True, pass_user_data=True)]
 	},
 	fallbacks=[CommandHandler('cancel', cancel)],
