@@ -39,6 +39,7 @@ def ordering_from(bot, update, user_data):
 
 	user_data['location'] = update.message.text
 
+	logger.info("Current user_data: %s", user_data)
 	logger.info("%s Ordering from: %s", user.first_name, update.message.text)
 
 	if user_data['confirmation']:
@@ -60,6 +61,7 @@ def order_close(bot, update, user_data):
 		'Invalid close time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
 		return ORDER_CLOSE
 
+	logger.info("Current user_data: %s", user_data)
 	logger.info("%s Order closes: %s", user.first_name, update.message.text)
 
 	if user_data['confirmation']:
@@ -81,6 +83,7 @@ def arrival_time(bot, update, user_data):
 		'Invalid arrival time! Please use HHMM, e.g. 1630 for 4:30pm, 0430 for 4:30am')
 		return ARRIVAL_TIME
 
+	logger.info("Current user_data: %s", user_data)
 	logger.info("%s Arrival time: %s", user.first_name, update.message.text)
 
 	if user_data['confirmation']:
