@@ -98,8 +98,9 @@ def pick_up_point(bot, update, chat_data):
 	return send_confirmation(bot, update, chat_data)
 
 
-def register_delivery(bot, update, delivery, job_queue):
+def register_delivery(bot, update, chat_data, job_queue):
 	user = update.message.from_user
+	delivery = chat_data['user.id']
 
 	deliveryId = database.start_delivery(delivery)
 	delivery['id'] = deliveryId
@@ -140,19 +141,20 @@ def edit_choice(bot, update, chat_data, job_queue):
 		return register_delivery(bot, update, chat_data, job_queue)
 	elif choice == '/from':
 		update.message.reply_text("Please enter the new location")
-		return ordering_from(bot, update, chat_data)
+		return ORDERING_FROM
 	elif choice == '/closing':
 		update.message.reply_text("Please enter the new closing time")
-		return order_close(bot, update, chat_data)
+		return ORDER_CLOSE
 	elif choice == '/arriving':
 		update.message.reply_text("Please enter the new arrival time")
-		return arrival_time(bot, update, chat_data)
+		return ARRIVAL_TIME
 	elif choice == '/pickup':
 		update.message.reply_text("Please enter the new pickup location")
-		return pick_up_point(bot, update, chat_data)
+		return PICK_UP_POINT
 	else:
 		update.message.reply_text("Invalid command, please try again")
 		return CONFIRMATION
+
 
 def send_confirmation(bot, update, chat_data):
 	chat_data['confirmation'] = True
