@@ -97,7 +97,7 @@ def mark_up(bot, update, user_data):
 		user_data['markup'] = int(update.message.text)
 	except:
 		update.message.reply_text("Please enter a valid markup in cents!")
-		return PRICE
+		return MARK_UP
 
 	logger.info("%s Markup: %s", user.first_name, update.message.text)
 
