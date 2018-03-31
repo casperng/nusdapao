@@ -19,6 +19,8 @@ def build_view_all_orders_string(deliveries):
         return "There are no active deliveries now"
     result = ""
     for code, delivery in deliveries.items():
+        delivery['price'] = cents_to_dollars_string(delivery['price'])
+        delivery['markup'] = cents_to_dollars_string(delivery['markup'])
         result +=       'Delivery {id} for {dish} from {location} by {username}\n' \
 				        'Price: {price}\n' \
 						'Markup: {markup}\n' \
@@ -32,6 +34,9 @@ def build_view_all_orders_string(deliveries):
 def build_date_string(datetime):
     return datetime.strftime("%H:%M %d/%m/%y")
 
+
+def cents_to_dollars_string(cents):
+    return '{:.2f}'.format(cents/100)
 
 def pop_all_keys(dct):
     for key in list(dct.keys()):

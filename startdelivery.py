@@ -67,7 +67,7 @@ def ordering_from(bot, update, user_data):
 		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
-		'What is the price in cents?')
+		'What is the price in dollars?')
 
 	return PRICE
 
@@ -75,9 +75,9 @@ def price(bot, update, user_data):
 	user = update.message.from_user
 
 	try:
-		user_data['price'] = int(update.message.text)
+		user_data['price'] = cents_from_text(update.message.text)
 	except:
-		update.message.reply_text("Please enter a valid price in cents!")
+		update.message.reply_text("Please enter a valid price in dollars!")
 		return PRICE
 
 	logger.info("%s Price: %s", user.first_name, update.message.text)
@@ -86,7 +86,7 @@ def price(bot, update, user_data):
 		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
-		'What is the markup in cents?')
+		'What is the markup in dollars?')
 
 	return MARK_UP
 
@@ -94,9 +94,9 @@ def mark_up(bot, update, user_data):
 	user = update.message.from_user
 
 	try:
-		user_data['markup'] = int(update.message.text)
+		user_data['markup'] = cents_from_text(update.message.text)
 	except:
-		update.message.reply_text("Please enter a valid markup in cents!")
+		update.message.reply_text("Please enter a valid markup in dollars!")
 		return MARK_UP
 
 	logger.info("%s Markup: %s", user.first_name, update.message.text)
@@ -173,12 +173,6 @@ def register_delivery(bot, update, user_data, job_queue):
 	update.message.reply_text(
 		'Thank you, your delivery has been registered! Its ID is %s' % str(deliveryId))
 
-	# send message to group chat
-	bot.send_message(
-		delivery['chat'],
-		ORDER_CONFIRM_MESSAGE.format(**delivery)
-	)
-
 	job1 = job_queue.run_once(
 		notifications.notify_close,
 		delivery['closes'].astimezone().replace(tzinfo=None),
@@ -195,6 +189,15 @@ def register_delivery(bot, update, user_data, job_queue):
 		context=delivery)
 
 	logger.info('%s\'s delivery: %s', user.first_name, delivery)
+
+	delivery['price'] = utilities.cents_to_dollars_string(delivery['price'])
+	delivery['markup'] = utilities.cents_to_dollars_string(delivery['markup'])
+	# send message to group chat
+	bot.send_message(
+		delivery['chat'],
+		ORDER_CONFIRM_MESSAGE.format(**delivery)
+	)
+
 	return ConversationHandler.END
 
 
@@ -234,8 +237,8 @@ def send_confirmation(bot, update, user_data):
 	text = "Reply /yes to confirm your details, or click on the headers to edit them:\n" \
 		   "/from: " + user_data['location'] + "\n" \
 		   "/dish: " + user_data['dish'] + "\n" \
-		   "/price: " + str(user_data['price']) + "\n" \
-		   "/markup: " + str(user_data['markup']) + "\n" \
+		   "/price: " + utilities.cents_to_dollars_string(user_data['price']) + "\n" \
+		   "/markup: " + utilities.cents_to_dollars_string(user_data['markup']) + "\n" \
 		   "/closing: " + utilities.build_date_string(user_data['closes']) + "\n" \
 		   "/arriving: " + utilities.build_date_string(user_data['arrival']) + "\n" \
 		   "/pickup: " + user_data['pickup']
@@ -249,6 +252,13 @@ def cancel(bot, update):
 	update.message.reply_text(
 		"Your request to start a delivery has been cancelled!")
 	return ConversationHandler.END
+
+
+def cents_from_text(text):
+	if text[0] == '$':
+		text = text[1:]
+	price_dollars = float(text)
+	return int(price_dollars * 100)
 
 
 def datetime_from_text(text):
