@@ -217,7 +217,7 @@ def get_all_orders():
 	cursor.execute(
 		"""
         SELECT * FROM deliveries t1
-        INNER JOIN orders t2
+        LEFT JOIN orders t2
         ON t1.id = t2.deliveryid
         WHERE t1.closes > NOW()
         """
@@ -241,13 +241,14 @@ def get_all_orders():
 					'username': row[10],
 					'orders': []
 				}
-			result[row[0]]['orders'].append(
-				{
-					'username': row[14],
-					'method': row[15],
-					'remarks': row[16],
-					'qty': row[17]
-				}
+			if row[14]:
+				result[row[0]]['orders'].append(
+					{
+						'username': row[14],
+						'method': row[15],
+						'remarks': row[16],
+						'qty': row[17]
+					}
 			)
 
 		return result
