@@ -22,8 +22,7 @@ def build_view_all_orders_string(deliveries):
         delivery['price'] = cents_to_dollars_string(delivery['price'])
         delivery['markup'] = cents_to_dollars_string(delivery['markup'])
         result +=       'Delivery {id} for {dish} from {location} by {username}\n' \
-				        'Price: {price}\n' \
-						'Markup: {markup}\n' \
+				        'Price: {price} (+{markup} delivery fee)\n' \
 						'Closing: {closes}\n' \
 						'Arriving: {arrival}\n' \
 						'Pickup: {pickup}\n'.format(**delivery, id=code)
