@@ -21,6 +21,8 @@ def build_view_all_orders_string(deliveries):
     for code, delivery in deliveries.items():
         delivery['price'] = cents_to_dollars_string(delivery['price'])
         delivery['markup'] = cents_to_dollars_string(delivery['markup'])
+        delivery['closes'] = build_date_string(delivery['closes'])
+        delivery['arrival'] = build_date_string(delivery['arrival'])
         result +=       'Delivery {id} for {dish} from {location} by {username}\n' \
 				        'Price: {price} (+{markup} delivery fee)\n' \
 						'Closing: {closes}\n' \
@@ -31,7 +33,7 @@ def build_view_all_orders_string(deliveries):
 
 
 def build_date_string(datetime):
-    return datetime.strftime("%H:%M %d/%m/%y")
+    return datetime.strftime("%H:%M (%a)")
 
 
 def cents_to_dollars_string(cents):

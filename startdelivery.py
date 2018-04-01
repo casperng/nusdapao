@@ -191,6 +191,8 @@ def register_delivery(bot, update, user_data, job_queue):
 
 	delivery['price'] = utilities.cents_to_dollars_string(delivery['price'])
 	delivery['markup'] = utilities.cents_to_dollars_string(delivery['markup'])
+	delivery['closes'] = utilities.build_date_string(delivery['closes'])
+	delivery['arrival'] = utilities.build_date_string(delivery['arrival'])
 	# send message to group chat
 	bot.send_message(
 		delivery['chat'],
