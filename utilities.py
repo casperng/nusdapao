@@ -23,7 +23,7 @@ def build_view_all_orders_string(deliveries):
         delivery['markup'] = cents_to_dollars_string(delivery['markup'])
         delivery['closes'] = build_date_string(delivery['closes'])
         delivery['arrival'] = build_date_string(delivery['arrival'])
-        result +=       'Delivery {id} for {dish} from {location} by {username}\n' \
+        result +=       'Delivery {id} for {dish} from {location} by {username} {usertag}\n' \
 				        'Price: {price} (+{markup} delivery fee)\n' \
 						'Closing: {closes}\n' \
 						'Arriving: {arrival}\n' \

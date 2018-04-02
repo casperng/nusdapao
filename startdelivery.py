@@ -10,7 +10,7 @@ import pytz
 import os
 from datetime import date, datetime, timedelta
 
-ORDER_CONFIRM_MESSAGE = 'Delivery for {dish} from {location} by {username}\n' \
+ORDER_CONFIRM_MESSAGE = 'Delivery for {dish} from {location} by {username} {usertag}\n' \
 						'Price: {price} (+{markup} delivery fee)\n' \
 						'Closing: {closes}\n' \
 						'Arriving: {arrival}\n' \
@@ -30,6 +30,9 @@ def start_delivery(bot, update, user_data):
 	user_data['chat'] = update.message.chat_id
 	user_data['user'] = update.message.from_user.id
 	user_data['username'] = update.message.from_user.first_name
+	user_data['usertag'] = update.message.from_user.username or ''
+	if user_data['usertag']:
+		user_data['usertag'] = '@' + user_data['usertag']
 	user_data['confirmation'] = False
 
 	logger.info("Current user_data: %s", user_data)
