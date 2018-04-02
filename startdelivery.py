@@ -192,15 +192,10 @@ def register_delivery(bot, update, user_data, job_queue):
 
 	logger.info('%s\'s delivery: %s', user.first_name, delivery)
 
-	delivery['price'] = utilities.cents_to_dollars_string(delivery['price'])
-	delivery['markup'] = utilities.cents_to_dollars_string(delivery['markup'])
-	delivery['closes'] = utilities.build_date_string(delivery['closes'])
-	delivery['arrival'] = utilities.build_date_string(delivery['arrival'])
-	# send message to group chat
-	bot.send_message(
-		delivery['chat'],
-		ORDER_CONFIRM_MESSAGE.format(**delivery)
-	)
+	deliveries = database.get_all_orders()
+	text = utilities.build_view_all_orders_string(deliveries)
+	bot.send_message(user_data['chat'],
+					 text)
 
 	return ConversationHandler.END
 
