@@ -22,7 +22,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 logger = logging.getLogger(__name__)
 
-DISH, ORDERING_FROM, PRICE, MARK_UP, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT, CONFIRMATION = range(8)
+ORDERING_FROM, DISH, PRICE, MARK_UP, ORDER_CLOSE, ARRIVAL_TIME, PICK_UP_POINT, CONFIRMATION = range(8)
 
 
 def start_delivery(bot, update, user_data):
@@ -37,23 +37,7 @@ def start_delivery(bot, update, user_data):
 
 	logger.info("Current user_data: %s", user_data)
 
-	bot.send_message(update.message.from_user.id, 'Hi! What food are you delivering? Send /cancel to cancel this request anytime')
-
-	return DISH
-
-def dish(bot, update, user_data):
-	user = update.message.from_user
-
-	user_data['dish'] = update.message.text
-
-	logger.info("Current user_data: %s", user_data)
-	logger.info("%s dish: %s", user.first_name, update.message.text)
-
-	if user_data['confirmation']:
-		return send_confirmation(bot, update, user_data)
-
-	update.message.reply_text(
-		'Where are you ordering food from?')
+	bot.send_message(update.message.from_user.id, 'Hi! Where are you ordering food from? Send /cancel to cancel this request anytime')
 
 	return ORDERING_FROM
 
@@ -69,9 +53,27 @@ def ordering_from(bot, update, user_data):
 		return send_confirmation(bot, update, user_data)
 
 	update.message.reply_text(
+		'What food are you delivering?')
+
+	return DISH
+
+def dish(bot, update, user_data):
+	user = update.message.from_user
+
+	user_data['dish'] = update.message.text
+
+	logger.info("Current user_data: %s", user_data)
+	logger.info("%s dish: %s", user.first_name, update.message.text)
+
+	if user_data['confirmation']:
+		return send_confirmation(bot, update, user_data)
+
+	update.message.reply_text(
 		'What is the price in dollars?')
 
 	return PRICE
+
+
 
 def price(bot, update, user_data):
 	user = update.message.from_user
