@@ -33,6 +33,13 @@ def delivery_id(bot, update):
 		utilities.build_view_orders_string(orders))
 	return ConversationHandler.END
 
+
+def cancel_prompt(bot, update):
+	update.message.reply_text(
+		"Perhaps you meant to /cancel the current vieworders request?"
+	)
+
+
 def cancel(bot, update):
 	update.message.reply_text(
 		"Your request to view orders has been cancelled!")
@@ -45,6 +52,7 @@ view_orders_conv_handler = ConversationHandler(
 		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id),
 					  CommandHandler('cancel', cancel)],
 	},
-	fallbacks=[CommandHandler('cancel', cancel)],
+	fallbacks=[CommandHandler('cancel', cancel),
+			   MessageHandler(Filters.all, cancel_prompt)],
 	per_chat=False
 )

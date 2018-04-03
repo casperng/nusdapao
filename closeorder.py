@@ -56,6 +56,12 @@ def notify_closed_for_delivery(job_queue, deliveryid):
         job.schedule_removal()
 
 
+def cancel_prompt(bot, update):
+	update.message.reply_text(
+		"Perhaps you meant to /cancel the current closeorder request?"
+	)
+
+
 def cancel(bot, update):
     update.message.reply_text(
         "Your request to close orders has been cancelled!")
@@ -68,6 +74,7 @@ close_order_conv_handler = ConversationHandler(
         DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_job_queue=True),
                       CommandHandler('cancel', cancel)],
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[CommandHandler('cancel', cancel),
+               MessageHandler(Filters.all, cancel_prompt)],
 	per_chat=False
 )

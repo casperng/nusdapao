@@ -246,6 +246,10 @@ def send_confirmation(bot, update, user_data):
 	update.message.reply_text(text)
 	return CONFIRMATION
 
+def cancel_prompt(bot, update):
+	update.message.reply_text(
+		"Perhaps you meant to /cancel the current startdelivery request?"
+	)
 
 def cancel(bot, update):
 	user = update.message.from_user
@@ -303,6 +307,7 @@ start_delivery_conv_handler = ConversationHandler(
 					   CommandHandler('price', edit_choice, pass_job_queue=True, pass_user_data=True),
 					   CommandHandler('from', edit_choice, pass_job_queue=True, pass_user_data=True)]
 	},
-	fallbacks=[CommandHandler('cancel', cancel)],
+	fallbacks=[CommandHandler('cancel', cancel),
+			   MessageHandler(Filters.all, cancel_prompt)],
 	per_chat=False
 )

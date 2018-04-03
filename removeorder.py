@@ -75,6 +75,11 @@ def item_index(bot, update, user_data):
 
     return ConversationHandler.END
 
+def cancel_prompt(bot, update):
+	update.message.reply_text(
+		"Perhaps you meant to /cancel the current removeorder request?"
+	)
+
 def cancel(bot, update):
     update.message.reply_text(
         "Your order removal has been cancelled!")
@@ -89,6 +94,7 @@ remove_order_conv_handler = ConversationHandler(
         ITEM_INDEX: [MessageHandler(Filters.text, item_index, pass_user_data=True),
                      CommandHandler('cancel', cancel)],
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[CommandHandler('cancel', cancel),
+               MessageHandler(Filters.all, cancel_prompt)],
 	per_chat=False
 )

@@ -128,6 +128,12 @@ def send_confirmation(bot, update, user_data):
 	return CONFIRMATION
 
 
+def cancel_prompt(bot, update):
+	update.message.reply_text(
+		"Perhaps you meant to /cancel the current joindelivery request?"
+	)
+
+
 def cancel(bot, update):
 	update.message.reply_text(
 		"Your request to join the delivery has been cancelled!")
@@ -154,6 +160,7 @@ join_delivery_conv_handler = ConversationHandler(
 					   CommandHandler('remarks', edit_choice, pass_user_data=True),
 					   CommandHandler('method', edit_choice, pass_user_data=True)]
 	},
-	fallbacks=[CommandHandler('cancel', cancel)],
+	fallbacks=[CommandHandler('cancel', cancel),
+			   MessageHandler(Filters.all, cancel_prompt)],
 	per_chat=False
 )
