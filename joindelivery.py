@@ -5,6 +5,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 import database
 import utilities
+from utilities import only_allow_private_message
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					level=logging.INFO)
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 DELIVERY_ID, QUANTITY, PAYMENT_METHOD, REMARKS, CONFIRMATION = range(5)
 
 
+@only_allow_private_message
 def join_delivery(bot, update, user_data):
 	utilities.pop_all_keys(user_data)
 	user_data['userid'] = update.message.from_user.id
@@ -25,6 +27,7 @@ def join_delivery(bot, update, user_data):
 	return DELIVERY_ID
 
 
+@only_allow_private_message
 def delivery_id(bot, update, user_data):
 	user = update.message.from_user
 
@@ -48,6 +51,7 @@ def delivery_id(bot, update, user_data):
 	return QUANTITY
 
 
+@only_allow_private_message
 def quantity(bot, update, user_data):
 	user = update.message.from_user
 
@@ -64,6 +68,7 @@ def quantity(bot, update, user_data):
 	return PAYMENT_METHOD
 
 
+@only_allow_private_message
 def payment_method(bot, update, user_data):
 	user = update.message.from_user
 
@@ -80,6 +85,7 @@ def payment_method(bot, update, user_data):
 	return REMARKS
 
 
+@only_allow_private_message
 def remarks(bot, update, user_data):
 	user = update.message.from_user
 
@@ -100,6 +106,7 @@ def register_order(bot, update, user_data):
 	return ConversationHandler.END
 
 
+@only_allow_private_message
 def edit_choice(bot, update, user_data):
 	choice = update.message.text
 	if choice == '/yes':
@@ -132,6 +139,7 @@ def cancel_prompt(bot, update):
 	bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current joindelivery request?")
 
 
+@only_allow_private_message
 def cancel(bot, update):
 	update.message.reply_text(
 		"Your request to join the delivery has been cancelled!")

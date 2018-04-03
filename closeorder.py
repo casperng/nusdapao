@@ -4,6 +4,8 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
                           ConversationHandler)
 
 import database
+from utilities import only_allow_private_message
+
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
@@ -28,6 +30,7 @@ def close_order(bot, update, job_queue):
     return DELIVERY_ID
 
 
+@only_allow_private_message
 def delivery_id(bot, update, job_queue):
     deliveryid = update.message.text
     if not database.is_valid_delivery_id(deliveryid):
@@ -60,6 +63,7 @@ def cancel_prompt(bot, update):
     bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current closeorder request?")
 
 
+@only_allow_private_message
 def cancel(bot, update):
     update.message.reply_text(
         "Your request to close orders has been cancelled!")

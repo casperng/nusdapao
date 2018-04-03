@@ -6,6 +6,7 @@ import logging
 import database
 import notifications
 import utilities
+from utilities import only_allow_private_message
 import pytz
 import os
 from datetime import date, datetime, timedelta
@@ -41,6 +42,8 @@ def start_delivery(bot, update, user_data):
 
 	return ORDERING_FROM
 
+
+@only_allow_private_message
 def ordering_from(bot, update, user_data):
 	user = update.message.from_user
 
@@ -57,6 +60,8 @@ def ordering_from(bot, update, user_data):
 
 	return DISH
 
+
+@only_allow_private_message
 def dish(bot, update, user_data):
 	user = update.message.from_user
 
@@ -74,7 +79,7 @@ def dish(bot, update, user_data):
 	return PRICE
 
 
-
+@only_allow_private_message
 def price(bot, update, user_data):
 	user = update.message.from_user
 
@@ -94,6 +99,8 @@ def price(bot, update, user_data):
 
 	return MARK_UP
 
+
+@only_allow_private_message
 def mark_up(bot, update, user_data):
 	user = update.message.from_user
 
@@ -114,6 +121,7 @@ def mark_up(bot, update, user_data):
 	return ORDER_CLOSE
 
 
+@only_allow_private_message
 def order_close(bot, update, user_data):
 	user = update.message.from_user
 
@@ -136,6 +144,7 @@ def order_close(bot, update, user_data):
 	return ARRIVAL_TIME
 
 
+@only_allow_private_message
 def arrival_time(bot, update, user_data):
 	user = update.message.from_user
 
@@ -158,6 +167,7 @@ def arrival_time(bot, update, user_data):
 	return PICK_UP_POINT
 
 
+@only_allow_private_message
 def pick_up_point(bot, update, user_data):
 	user = update.message.from_user
 
@@ -202,6 +212,7 @@ def register_delivery(bot, update, user_data, job_queue):
 	return ConversationHandler.END
 
 
+@only_allow_private_message
 def edit_choice(bot, update, user_data, job_queue):
 	choice = update.message.text
 	if choice == '/yes':
@@ -246,10 +257,12 @@ def send_confirmation(bot, update, user_data):
 	update.message.reply_text(text)
 	return CONFIRMATION
 
+
 def cancel_prompt(bot, update):
 	bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current startdelivery request?")
 
 
+@only_allow_private_message
 def cancel(bot, update):
 	user = update.message.from_user
 	logger.info("User %s canceled the conversation.", user.first_name)

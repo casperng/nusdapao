@@ -5,6 +5,7 @@ from telegram.ext import (Updater, CommandHandler, MessageHandler, Filters, Rege
 
 import database
 import utilities
+from utilities import only_allow_private_message
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
 					level=logging.INFO)
@@ -19,6 +20,7 @@ def view_orders(bot, update):
 	return DELIVERY_ID
 
 
+@only_allow_private_message
 def delivery_id(bot, update):
 	deliveryId = update.message.text
 	if not database.is_valid_delivery_id(deliveryId):
@@ -38,6 +40,7 @@ def cancel_prompt(bot, update):
 	bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current vieworders request?")
 
 
+@only_allow_private_message
 def cancel(bot, update):
 	update.message.reply_text(
 		"Your request to view orders has been cancelled!")

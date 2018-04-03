@@ -39,6 +39,16 @@ def build_date_string(datetime):
 def cents_to_dollars_string(cents):
     return '{:.2f}'.format(cents/100)
 
+
 def pop_all_keys(dct):
     for key in list(dct.keys()):
         del dct[key]
+
+
+def only_allow_private_message(fn):
+    def wrapped(bot, update, *args, **kwargs):
+        if update.message.from_user.id != update.message.chat_id:
+            return
+        return fn(bot, update, *args, **kwargs)
+    return wrapped
+
