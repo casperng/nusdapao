@@ -247,9 +247,8 @@ def send_confirmation(bot, update, user_data):
 	return CONFIRMATION
 
 def cancel_prompt(bot, update):
-	update.message.reply_text(
-		"Perhaps you meant to /cancel the current startdelivery request?"
-	)
+	bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current startdelivery request?")
+
 
 def cancel(bot, update):
 	user = update.message.from_user

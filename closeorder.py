@@ -57,9 +57,7 @@ def notify_closed_for_delivery(job_queue, deliveryid):
 
 
 def cancel_prompt(bot, update):
-	update.message.reply_text(
-		"Perhaps you meant to /cancel the current closeorder request?"
-	)
+    bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current closeorder request?")
 
 
 def cancel(bot, update):

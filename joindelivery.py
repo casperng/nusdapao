@@ -129,9 +129,7 @@ def send_confirmation(bot, update, user_data):
 
 
 def cancel_prompt(bot, update):
-	update.message.reply_text(
-		"Perhaps you meant to /cancel the current joindelivery request?"
-	)
+	bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current joindelivery request?")
 
 
 def cancel(bot, update):

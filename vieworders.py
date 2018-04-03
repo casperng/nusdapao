@@ -35,9 +35,7 @@ def delivery_id(bot, update):
 
 
 def cancel_prompt(bot, update):
-	update.message.reply_text(
-		"Perhaps you meant to /cancel the current vieworders request?"
-	)
+	bot.send_message(update.message.from_user.id, "Perhaps you meant to /cancel the current vieworders request?")
 
 
 def cancel(bot, update):
