@@ -8,7 +8,7 @@ from telegram.error import (TelegramError, Unauthorized, BadRequest,
 import startdelivery, joindelivery, vieworders, removeorder, closeorder, viewallorders
 
 def start(bot, update):
-	update.effective_message.reply_text("Hi there! Please type / and click on a command from the list!")
+	update.effective_message.reply_text("Hi there! Please type / and click on a command from the list.")
 
 def error(bot, update, error):
 	try:
