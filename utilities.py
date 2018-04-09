@@ -34,7 +34,7 @@ def build_view_all_orders_string(deliveries):
 
 
 def build_date_string(datetime):
-    return datetime.replace(tzinfo=pytz.timezone('Asia/Singapore')).strftime("%H:%M (%a)")
+    return datetime.astimezone(tz=pytz.timezone('Asia/Singapore')).strftime("%H:%M (%a)")
 
 
 def cents_to_dollars_string(cents):
