@@ -12,7 +12,7 @@ import os
 from datetime import date, datetime, timedelta
 
 ORDER_CONFIRM_MESSAGE = 'Delivery for {dish} from {location} by {username} {usertag}\n' \
-						'Price: {price} (+{markup} delivery fee)\n' \
+						'Price: ${price} (+${markup} delivery fee)\n' \
 						'Closing: {closes}\n' \
 						'Arriving: {arrival}\n' \
 						'Pickup: {pickup}\n' \
