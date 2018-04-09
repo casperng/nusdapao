@@ -16,7 +16,7 @@ def error(bot, update, error):
 	except Unauthorized:
 		if update.message.from_user.id != update.message.chat_id:
 			bot.send_message(update.message.chat_id,
-							 "You have to start a conversation with me first!",
+							 "Hello, Dabao Boys & Girls! Click on the Start button to begin.",
 							 reply_markup=InlineKeyboardMarkup([[
 								 InlineKeyboardButton(text="Start!",
 													  url="https://telegram.me/" + os.environ.get('BOT_NAME', 'nusdapao_bot'))
