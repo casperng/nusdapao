@@ -1,3 +1,4 @@
+import pytz
 
 def build_view_orders_string(orders):
     ORDER_MESSAGE_TEMPLATE = "The orders are:\n"
@@ -24,7 +25,7 @@ def build_view_all_orders_string(deliveries):
         delivery['closes'] = build_date_string(delivery['closes'])
         delivery['arrival'] = build_date_string(delivery['arrival'])
         result +=       'Delivery {id} for {dish} from {location} by {username} {usertag}\n' \
-				        'Price: {price} (+{markup} delivery fee)\n' \
+				        'Price: ${price} (+${markup} delivery fee)\n' \
 						'Closing: {closes}\n' \
 						'Arriving: {arrival}\n' \
 						'Pickup: {pickup}\n'.format(**delivery, id=code)
@@ -33,7 +34,7 @@ def build_view_all_orders_string(deliveries):
 
 
 def build_date_string(datetime):
-    return datetime.strftime("%H:%M (%a)")
+    return datetime.replace(tzinfo=pytz.timezone('Asia/Singapore')).strftime("%H:%M (%a)")
 
 
 def cents_to_dollars_string(cents):
