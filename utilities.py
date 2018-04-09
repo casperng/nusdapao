@@ -17,7 +17,7 @@ def build_view_orders_string(orders):
 
 def build_view_all_orders_string(deliveries):
     if not deliveries:
-        return "There are no active deliveries now"
+        return "There are no active deliveries now. Check back again later!"
     result = ""
     for code, delivery in deliveries.items():
         delivery['price'] = cents_to_dollars_string(delivery['price'])
