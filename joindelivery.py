@@ -147,7 +147,7 @@ def cancel(bot, update):
 
 
 join_delivery_conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('joindeliverie', join_delivery, pass_user_data=True)],
+	entry_points=[CommandHandler('joindelivery', join_delivery, pass_user_data=True)],
 	states={
 		DELIVERY_ID: [MessageHandler(Filters.text, delivery_id, pass_user_data=True),
 					  CommandHandler('cancel', cancel)],
