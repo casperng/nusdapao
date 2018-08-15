@@ -44,7 +44,7 @@ def delivery_id(bot, update, user_data):
 
 	logger.info("%s for delivery: %s", user.first_name, update.message.text)
 	update.message.reply_text(
-		'How many of this item(' + 'OOL' + ') are you getting? (Please enter a numerical figure, additional comments can be filled in under remarks)')
+		'How many of this item(' + database.get_dish_name + ') are you getting? (Please enter a numerical figure, additional comments can be filled in under remarks)')
 
 	user_data['deliveryId'] = update.message.text
 
