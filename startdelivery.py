@@ -280,7 +280,7 @@ def datetime_from_text(text):
 
 
 start_delivery_conv_handler = ConversationHandler(
-	entry_points=[CommandHandler('startdelivery', start_delivery, pass_user_data=True)],
+	entry_points=[CommandHandler('createmenu', start_delivery, pass_user_data=True)],
 	states={
 		DISH: [MessageHandler(Filters.text, dish, pass_user_data=True),
 			   CommandHandler('cancel', cancel)],
