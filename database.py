@@ -88,8 +88,14 @@ def get_dish_name(deliveryId):
 	results = cursor.fetchall()
 	cursor.close()
 
-	itemname = results[0][0]
-	return itemname
+	def repack(row):
+		dish = row
+		return {
+			'dish': dish,
+		}
+
+	return list(map(repack, results))
+
 
 
 @with_rollback
