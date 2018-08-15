@@ -80,7 +80,7 @@ def get_dish_name(deliveryId):
 	cursor = CONN.cursor()
 	cursor.execute(
 		"""
-		SELECT COUNT(*) from deliveries 
+		SELECT dish from deliveries 
 		WHERE id = %s
 		""",
 		[deliveryId]
